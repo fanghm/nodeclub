@@ -1,0 +1,196 @@
+<%- partial('../editor_sidebar') %>
+
+<div id='content'>
+  <div class='panel'>
+    <div class='header'>
+      <ol class='breadcrumb'>
+        <li><a href='/'>主页</a><span class='divider'>/</span></li>
+        <% if(typeof(action) !== 'undefined' && action == 'edit'){ %>
+          <li class='active'>编辑话题</li>
+        <% }else{ %>
+          <li class='active'>发布话题</li>
+        <% } %>
+      </ol>
+    </div>
+    <div class='inner post'>
+      <% if(typeof(edit_error) !== 'undefined' && edit_error){ %>
+        <div class="alert alert-error">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <strong><%= edit_error %></strong>
+      </div>
+      <% } %>
+
+      <% if(typeof(error) !== 'undefined' && error){ %>
+        <div class="alert alert-error">
+        <strong><%= error %></strong>
+      </div>
+      <% }else{ %>
+      <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
+        <form id='create_topic_form' action='/topic/<%= topic_id %>/edit' method='post'>
+      <% } else { %>
+        <form id='create_topic_form' action='/topic/createEvent' method='post'>
+          <% } %>
+
+          <fieldset>
+            <span class="tab-selector">选择版块：</span>
+            <select name="tab" id="tab-value">
+              <option value="">请选择</option>
+              <%
+              var tabValue = '';
+              if (typeof(tab) !== 'undefined') {
+                tabValue = tab;
+              }
+              tabs.forEach(function (pair) {
+                var value = pair[0];
+                var text = pair[1];
+                %>
+                <option value="<%=value%>" <%= tabValue === value ? 'selected': '' %>><%=text%></option>
+
+              <%});%>
+            </select>
+
+            <span id="topic_create_warn"></span>
+
+<!--活动详细信息-->
+            <label for="title" class="control-label">活动主题*</label>
+            <textarea autofocus class='span9' id='title' name='title' rows='1'
+                      placeholder="标题字数 10 字以上"
+                    ><%= typeof(title) !== 'undefined' && title || '' %></textarea>
+
+            <label for="category" class="control-label">活动类型*</label>
+            <select id='category' name='category'>
+              <option value="badminton">Badminton</option>
+              <option value="basketball">Basketball</option>
+              <option value="hiking" selected>Hiking</option>
+            </select>
+
+            <label for="repeats" class="control-label">期数*</label>
+            <input type="number" id='repeats' name='repeats' min=1 value="<%= typeof(repeats) !== 'undefined' && repeats || '1' %>" />
+
+            <label for="t_content" class="control-label">活动内容描述*</label>
+            <div class='markdown_editor in_editor'>
+              <div class='markdown_in_editor'>
+                <textarea class='editor' name='t_content' rows='3'
+                          placeholder='文章支持 Markdown 语法, 请注意标记代码'
+                        ><%= typeof(content) !== 'undefined' && content || '' %></textarea>
+              </div>
+            </div>
+
+            <label for="total" class="control-label">活动总人数限制*</label>
+            <input type="number" id="total" name="total" min=0 value="<%= typeof(total) !== 'undefined' && total || '0' %>" />(0 - no limit) 
+
+            <label for="limit" class="control-label">每人报名人数限制*</label>
+            <input type="number" id="limit" name="limit" min=1 value="<%= typeof(limit) !== 'undefined' && limit || '1' %>" />
+
+            <label for="address" class="control-label">活动地点*</label>
+            <textarea class='span9' id='address' name='address' rows='1' placeholder="address"
+                    ><%= typeof(address) !== 'undefined' && address || '' %></textarea>
+
+            <label for="contact" class="control-label">联系人及方法*</label>
+            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || '' %>" />
+
+            <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
+            <label class="radio-inline"><input type="radio" name="need_pay" value="0" checked />No</label>
+            <label class="radio-inline"><input type="radio" name="need_pay" value="1" />Yes</label>
+
+            <div id="4expense" style="display: none;">
+              <label for="expense" class="control-label">活动费用*</label>
+              <input type="text" id="expense" name="expense" value="<%= typeof(expense) !== 'undefined' && expense || '0' %>" />费用格式：<会员男>/<会员女>/<非会员男>/<非会员女>/<超过名额男>/<超过名额女> 
+            </div>
+
+            <label for="start_date" class="control-label">活动开始时间*</label>
+            <input type="text" id="start_date" name="start_date" value="<%= typeof(start_date) !== 'undefined' && start_date || '' %>" />
+            <label for="end_date" class="control-label">活动结束时间*</label>
+            <input type="text" id="end_date" name="end_date" value="<%= typeof(end_date) !== 'undefined' && end_date || '' %>" />
+            <label for="regret_date" class="control-label">活动退票截止时间*</label>
+            <input type="text" id="regret_date" name="regret_date" value="<%= typeof(regret_date) !== 'undefined' && regret_date || '' %>" />
+            <label for="deadline" class="control-label">活动报名截止时间*</label>
+            <input type="text" id="deadline" name="deadline" value="<%= typeof(deadline) !== 'undefined' && deadline || '' %>" />
+            
+
+            <label for="comment" class="control-label">其他注意事项</label>
+            <textarea class='span9' id='comment' name='comment' rows='3'
+                    ><%= typeof(comment) !== 'undefined' && comment || '' %></textarea>
+
+<!--报名详细信息-->
+            <!--label for="balance" class="control-label">本人帐户余额</label>
+            <label for="enroll_info" class="control-label">已报名名单</label>
+            <label for="enroll_name" class="control-label">填写报名名单*</label>
+            <label for="enroll_contact" class="control-label">填写联系方式*</label-->
+
+
+
+            <input type='hidden' id='topic_tags' name='topic_tags' value=''>
+            <input type='hidden' name='_csrf' value='<%= csrf %>'>
+
+            <div class='editor_buttons'>
+              <input type="submit" class='span-primary submit_btn' data-loading-text="提交中"
+                     value="Save">
+              <input type="reset" class='span-primary submit_btn' data-loading-text="提交中"
+                     value="Reset">
+            </div>
+
+<!--本人报名人员：10，其中正在排队人员：10 (红色区域为排队人员)-->
+          </fieldset>
+        </form>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- markdown editor -->
+<%- partial('../includes/editor') %>
+<script>
+  (function () {
+    $('#start_date').datetimepicker({step:30, minDate:0, });
+    $('#end_date').datetimepicker({
+      step:30, 
+      onShow:function( ct ){
+        this.setOptions({
+          minDate:jQuery('#start_date').val()?jQuery('#start_date').val():false
+        })
+      },
+    });
+    $('#regret_date').datetimepicker({step:30, minDate:0, });
+    $('#deadline').datetimepicker({step:30, minDate:0, });
+
+    $("input[name$='need_pay']").click(function() {
+        if ($(this).val() == '1') {
+          document.getElementById('4expense').style.display = "block"; //inline-block
+        }
+        else {
+          document.getElementById('4expense').style.display = "none";
+        }
+    });
+
+    // -------------------------------------
+    var editor = new Editor();
+    editor.render($('.editor')[0]);
+
+    // 版块选择的检查，必须选择
+    $('#create_topic_form').on('submit', function (e) {
+      var tabValue = $('#tab-value').val();
+      if (!tabValue) {
+        alert('必须选择一个版块！');
+        $('.submit_btn').button('reset');
+        $('.tab-selector').css('color', 'red');
+        return false;
+      }
+    });
+    // END 版块选择的检查，必须选择
+
+    // 选择招聘版块时，给出提示
+    $('#tab-value').on('change', function () {
+      var $this = $(this);
+      var value = $this.val();
+      var warnMsg = '';
+      if (value === 'job') {
+        warnMsg = '<strong>为避免被管理员删帖，发帖时请好好阅读<a href="http://cnodejs.org/topic/541ed2d05e28155f24676a12" target="_blank">《招聘帖规范》</a></strong>';
+      } else if (value === 'ask') {
+        warnMsg = '<strong>提问时，请遵循 <a href="http://doc.zengrong.net/smart-questions/cn.html" target="_blank">《提问的智慧》</a>中提及的要点，以便您更接收到高质量回复。</strong>'
+      }
+      $('#topic_create_warn').html(warnMsg);
+    });
+    // END 选择招聘版块时，给出提示
+  })();
+</script>
