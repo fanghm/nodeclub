@@ -11,8 +11,8 @@ var ActivitySchema = new Schema({
 
   title: { type: String },    // 活动主题
   category: { type: String }, // 活动类型
+  content: { type: String },  // 活动内容描述
   repeats: { type: Number, default: 1 },  // 期数, + repeat interval (weekly/monthly...)?
-  content: { type: String },              // 活动内容描述
   total: { type: Number, default: 0 },    // 活动总人数限制
   limit: { type: Number, default: 1 },    // 每人报名人数限制, need?
   address: { type: String },  // 活动地点
@@ -33,17 +33,24 @@ var ActivitySchema = new Schema({
   deadline: { type: Date},    // 活动报名截止时间
   
   comment: { type: String },  // 其他注意事项
+  
+  top: { type: Boolean, default: false },       // 置顶帖
+  good: {type: Boolean, default: false},        // 精华帖
+  //lock: {type: Boolean, default: false},        // 被锁定主题 auto-lock after deadline?
+  reply_count: { type: Number, default: 0 },
+  visit_count: { type: Number, default: 0 },
+  collect_count: { type: Number, default: 0 },  // 收藏 关注, ->follow?
 
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now },
   
   content_is_html: { type: Boolean },
-  deleted: {type: Boolean, default: false},
+  deleted: {type: Boolean, default: false}, // status: locked(cannot reply), closed(only visible to owner/admin), deleted (only visible to admin), 
 });
 
 ActivitySchema.plugin(BaseModel);
 ActivitySchema.index({create_at: -1});
-//ActivitySchema.index({top: -1, last_reply_at: -1});
+ActivitySchema.index({top: -1, update_at: -1});
 ActivitySchema.index({author_id: 1, create_at: -1});
 
 ActivitySchema.virtual('tabName').get(function () {

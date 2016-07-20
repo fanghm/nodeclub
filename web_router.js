@@ -14,6 +14,7 @@ var site = require('./controllers/site');
 var user = require('./controllers/user');
 var message = require('./controllers/message');
 var topic = require('./controllers/topic');
+var activity = require('./controllers/activity');
 var reply = require('./controllers/reply');
 var rss = require('./controllers/rss');
 var staticController = require('./controllers/static');
@@ -72,7 +73,6 @@ router.get('/my/messages', auth.userRequired, message.index); // 用户个人的
 
 // 新建文章界面
 router.get('/topic/create', auth.userRequired, topic.create);
-
 router.get('/topic/:tid', topic.index);  // 显示某个话题
 router.post('/topic/:tid/top', auth.adminRequired, topic.top);  // 将某话题置顶
 router.post('/topic/:tid/good', auth.adminRequired, topic.good); // 将某话题加精
@@ -83,10 +83,18 @@ router.post('/topic/:tid/delete', auth.userRequired, topic.delete);
 
 // 保存新建的文章
 router.post('/topic/create', auth.userRequired, limit.peruserperday('create_topic', config.create_post_per_day, false), topic.put);
-
 router.post('/topic/:tid/edit', auth.userRequired, topic.update);
 router.post('/topic/collect', auth.userRequired, topic.collect); // 关注某话题
 router.post('/topic/de_collect', auth.userRequired, topic.de_collect); // 取消关注某话题
+
+// 活动
+router.get('/activity/create', auth.userRequired, activity.create);
+router.get('/activity/:aid', auth.userRequired, activity.index);
+router.post('/activity/enroll', auth.userRequired, activity.enroll);
+
+router.post('/activity/create', auth.userRequired, limit.peruserperday('create_topic', config.create_post_per_day, false), activity.put);
+router.get('/activity/collect', auth.adminRequired, activity.getEnrollment);	//签到表, for admin
+router.get('/activity/list', auth.userRequired, activity.list);	// 活动list
 
 // reply controller
 router.post('/:topic_id/reply', auth.userRequired, limit.peruserperday('create_reply', config.create_reply_per_day, false), reply.add); // 提交一级回复
@@ -95,6 +103,9 @@ router.post('/reply/:reply_id/edit', auth.userRequired, reply.update); // 修改
 router.post('/reply/:reply_id/delete', auth.userRequired, reply.delete); // 删除某评论
 router.post('/reply/:reply_id/up', auth.userRequired, reply.up); // 为评论点赞
 router.post('/upload', auth.userRequired, topic.upload); //上传图片
+
+// account
+//router.get('/account', auth.userRequired, account.showAccount);
 
 // static
 router.get('/about', staticController.about);

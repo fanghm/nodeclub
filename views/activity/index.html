@@ -48,7 +48,7 @@
     <div class='header topic_header'>
       <span class="topic_full_title">
 
-        <%- partial('./_top_good', {topic: topic}) %>
+        <%- partial('../topic/_top_good', {topic: topic}) %>
 
         <%= topic.title %>
       </span>
@@ -127,12 +127,22 @@
       <% } %>
     </div>
     <div class='inner topic'>
-
+    ======= this is an activity! =======
       <div class='topic_content'>
         <%- markdown(topic.linkedContent) %>
       </div>
     </div>
   </div>
+  <!--########## enrollments ###########-->
+  <% if (topic.enrollments && topic.enrollments.length > 0) { %>
+  <div class='panel'>
+    <div class='header'>
+      <span class='col_fade'><%= topic.enrollments.length %> enrollments</span>
+    </div>
+    <%- partial('../enrollment/enrollment2', topic.enrollments) %>
+  </div>
+  <% } %>
+
   <% if (topic.replies && topic.replies.length > 0) { %>
   <div class='panel'>
     <div class='header'>

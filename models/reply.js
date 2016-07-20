@@ -5,13 +5,13 @@ var ObjectId  = Schema.ObjectId;
 
 var ReplySchema = new Schema({
   content: { type: String },
-  topic_id: { type: ObjectId},
+  topic_id: { type: ObjectId},		// original post
   author_id: { type: ObjectId },
-  reply_id: { type: ObjectId },
+  reply_id: { type: ObjectId },		// the post it replies
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now },
   content_is_html: { type: Boolean },
-  ups: [Schema.Types.ObjectId],
+  ups: [Schema.Types.ObjectId],		// guys who like this reply
   deleted: {type: Boolean, default: false},
 });
 

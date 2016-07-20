@@ -12,6 +12,12 @@ if (config.debug) {
       infos.push(query._collection.collection.name + "." + method.blue);
       infos.push(JSON.stringify(info));
       infos.push((millis + 'ms').green);
+      
+      if (method !== 'findOne') {
+        infos.push('\n' + JSON.stringify(result).grey);
+        infos.push('\n\n');
+        //infos.push((JSON.parse(result).length + 'results').red);
+      }
 
       logger.debug("MONGO".magenta, infos.join(' '));
     };

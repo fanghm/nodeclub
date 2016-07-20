@@ -11,6 +11,7 @@ var validator = require('validator');
 var at           = require('../common/at');
 var User         = require('../proxy').User;
 var Topic        = require('../proxy').Topic;
+var Activity     = require('../models').Activity;
 var TopicCollect = require('../proxy').TopicCollect;
 var EventProxy   = require('eventproxy');
 var tools        = require('../common/tools');
@@ -18,7 +19,7 @@ var store        = require('../common/store');
 var config       = require('../config');
 var _            = require('lodash');
 var cache        = require('../common/cache');
-var logger = require('../common/logger')
+var logger = require('../common/logger');
 
 /**
  * Topic page
@@ -116,7 +117,6 @@ exports.create = function (req, res, next) {
     tabs: config.tabs
   });
 };
-
 
 exports.put = function (req, res, next) {
   var title   = validator.trim(req.body.title);

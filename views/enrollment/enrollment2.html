@@ -1,0 +1,60 @@
+<div class='cell reply_area reply_item'
+  id="reply<%= indexInCollection+1 %>" reply_id="<%= enrollment._id %>">
+  <a class="anchor" id="<%= enrollment._id %>"></a>
+
+  <div class='author_content'>
+    <a href="/user/<%= enrollment.author.loginname %>" class="user_avatar">
+      <img src="<%= proxy(enrollment.author.avatar_url) %>" title="<%= enrollment.author.loginname %>"/></a>
+
+    <div class='user_info'>
+      <a class='dark reply_author' href="/user/<%= enrollment.author.loginname %>"><%= enrollment.author.loginname %></a>
+      <a class="reply_time" href="#<%= enrollment._id %>"><%= indexInCollection + 1 %>楼•<%= enrollment.create_at.toString()
+        %></a>
+    </div>
+    <div class='user_action'>
+
+      <% if (current_user && current_user.is_admin ||
+      (current_user && current_user._id.toString() == enrollment.author._id.toString())
+      ) { %>
+      <a href='/reply/<%= enrollment._id %>/edit' class='edit_reply_btn'>
+        <i class="fa fa-pencil-square-o" title='编辑'></i>
+      </a>
+      <a href='javascript:void(0);' class='delete_reply_btn'>
+        <i class="fa fa-trash" title='删除'></i>
+      </a>
+      <% } %>
+      <span>
+        <% if (current_user){ %>
+          <i class="fa fa-reply reply2_btn" title="回复"></i>
+        <% } %>
+      </span>
+    </div>
+  </div>
+  <div class='reply_content from-<%= enrollment.author.loginname %>'>
+    <%- markdown(enrollment.option) %>
+  </div>
+  <div class='clearfix'>
+    <div class='reply2_area'>
+      <% if (current_user) { %>
+      <form class='reply2_form' action='/<%= topic._id %>/reply' method='post'>
+        <input type='hidden' name='_csrf' value='<%= csrf %>'/>
+        <input type='hidden' name='reply_id' value='<%= enrollment._id %>'/>
+
+        <div class='markdown_editor in_editor'>
+          <div class='markdown_in_editor'>
+            <textarea class='span8 editor reply_editor'
+                      id="reply2_editor_<%= enrollment._id %>" name='r_content' rows='4'></textarea>
+
+            <div class='editor_buttons'>
+              <input class='span-primary reply2_submit_btn submit_btn'
+                     type="submit" data-id='<%= enrollment._id %>' data-loading-text="回复中.." value="回复">
+            </div>
+          </div>
+
+        </div>
+
+      </form>
+      <% } %>
+    </div>
+  </div>
+</div>

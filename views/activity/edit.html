@@ -55,7 +55,7 @@
             <label for="title" class="control-label">活动主题*</label>
             <textarea autofocus class='span9' id='title' name='title' rows='1'
                       placeholder="标题字数 10 字以上"
-                    ><%= typeof(title) !== 'undefined' && title || '' %></textarea>
+                    ><%= typeof(title) !== 'undefined' && title || 'test topic - ' %></textarea>
 
             <label for="category" class="control-label">活动类型*</label>
             <select id='category' name='category'>
@@ -72,7 +72,7 @@
               <div class='markdown_in_editor'>
                 <textarea class='editor' name='t_content' rows='3'
                           placeholder='文章支持 Markdown 语法, 请注意标记代码'
-                        ><%= typeof(content) !== 'undefined' && content || '' %></textarea>
+                        ><%= typeof(content) !== 'undefined' && content || 'welcome to test...' %></textarea>
               </div>
             </div>
 
@@ -84,14 +84,14 @@
 
             <label for="address" class="control-label">活动地点*</label>
             <textarea class='span9' id='address' name='address' rows='1' placeholder="address"
-                    ><%= typeof(address) !== 'undefined' && address || '' %></textarea>
+                    ><%= typeof(address) !== 'undefined' && address || 'hztc' %></textarea>
 
             <label for="contact" class="control-label">联系人及方法*</label>
-            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || '' %>" />
+            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" />
 
             <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
-            <label class="radio-inline"><input type="radio" name="need_pay" value="0" checked />No</label>
-            <label class="radio-inline"><input type="radio" name="need_pay" value="1" />Yes</label>
+            <label class="radio-inline"><input type="radio" name="need_pay" value="0" checked >No</label>
+            <label class="radio-inline"><input type="radio" name="need_pay" value="1" >Yes</label>
 
             <div id="4expense" style="display: none;">
               <label for="expense" class="control-label">活动费用*</label>
@@ -99,18 +99,18 @@
             </div>
 
             <label for="start_date" class="control-label">活动开始时间*</label>
-            <input type="text" id="start_date" name="start_date" value="<%= typeof(start_date) !== 'undefined' && start_date || '' %>" />
+            <input type="text" id="start_date" name="start_date" value="<%= typeof(start_date) !== 'undefined' && start_date || '2016/06/20 14:00' %>" />
             <label for="end_date" class="control-label">活动结束时间*</label>
-            <input type="text" id="end_date" name="end_date" value="<%= typeof(end_date) !== 'undefined' && end_date || '' %>" />
+            <input type="text" id="end_date" name="end_date" value="<%= typeof(end_date) !== 'undefined' && end_date || '2016/07/20 14:00' %>" />
             <label for="regret_date" class="control-label">活动退票截止时间*</label>
-            <input type="text" id="regret_date" name="regret_date" value="<%= typeof(regret_date) !== 'undefined' && regret_date || '' %>" />
+            <input type="text" id="regret_date" name="regret_date" value="<%= typeof(regret_date) !== 'undefined' && regret_date || '2016/07/20 14:00' %>" />
             <label for="deadline" class="control-label">活动报名截止时间*</label>
-            <input type="text" id="deadline" name="deadline" value="<%= typeof(deadline) !== 'undefined' && deadline || '' %>" />
+            <input type="text" id="deadline" name="deadline" value="<%= typeof(deadline) !== 'undefined' && deadline || '2016/07/20 14:00' %>" />
             
 
             <label for="comment" class="control-label">其他注意事项</label>
             <textarea class='span9' id='comment' name='comment' rows='3'
-                    ><%= typeof(comment) !== 'undefined' && comment || '' %></textarea>
+                    ><%= typeof(comment) !== 'undefined' && comment || 'NA' %></textarea>
 
 <!--报名详细信息-->
             <!--label for="balance" class="control-label">本人帐户余额</label>
