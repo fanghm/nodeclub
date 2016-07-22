@@ -139,14 +139,14 @@ exports.index = function (req, res, next) {
     return res.render404('此activity话题不存在或已被删除。');
   }
 
-  var events = ['activity',];// 'activity_enrollments', 'activity_replies'];
+  var events = ['activity', 'is_collect'];
   var ep = EventProxy.create(events,
-    function (activity, other_activities, no_reply_activities, is_collect) {
+    function (activity, is_collect) { // /*other_activities, no_reply_activities,*/ 
     res.render('activity/index', {
       topic: activity,
-      author_other_topics: other_activities,
-      no_reply_topics: no_reply_activities,
-      is_uped: isUped,
+      //author_other_topics: other_activities,
+      //no_reply_topics: no_reply_activities,
+      is_uped: false, //isUped,
       is_collect: is_collect,
     });
   });
@@ -165,7 +165,7 @@ exports.index = function (req, res, next) {
     activity.author  = author;
     activity.replies = replies;
     activity.enrollments = enrollments;
-    activity.reply_up_threshold = 3;
+    activity.reply_up_threshold = 1;
     /*/ 点赞数排名第三的回答，它的点赞数就是阈值, only used in view
     activity.reply_up_threshold = (function () {
       var allUpCount = replies.map(function (reply) {

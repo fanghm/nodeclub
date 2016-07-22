@@ -39,10 +39,11 @@ exports.getFullActivity = function (id, callback) {
       proxy.unbind();
       return callback(null, '此activity不存在或已被删除。');
     }
-    at.linkUsers(topic.content, proxy.done('topic', function (str) {
-      topic.linkedContent = str;
-      return topic;
-    }));
+    proxy.emit('topic', topic);
+    // at.linkUsers(topic.content, proxy.done('topic', function (str) {
+    //   topic.linkedContent = str;  // TODO: not used
+    //   return topic;
+    // }));
 
     User.getUserById(topic.author_id, proxy.done(function (author) {
       if (!author) {
@@ -56,4 +57,13 @@ exports.getFullActivity = function (id, callback) {
 
     Enrollment.getEnrollmentsByActivityId(topic._id, proxy.done('enrollments'));
   }));
+};
+
+/**
+ * 根据主题ID，查找一条主题
+ * @param {String} id 主题ID
+ * @param {Function} callback 回调函数
+ */
+exports.getActivity = function (id, callback) {
+  Activity.findOne({_id: id}, callback);
 };

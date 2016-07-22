@@ -15,6 +15,8 @@ var user = require('./controllers/user');
 var message = require('./controllers/message');
 var topic = require('./controllers/topic');
 var activity = require('./controllers/activity');
+var enrollment = require('./controllers/enrollment');
+//var account = require('./controllers/account');
 var reply = require('./controllers/reply');
 var rss = require('./controllers/rss');
 var staticController = require('./controllers/static');
@@ -90,7 +92,7 @@ router.post('/topic/de_collect', auth.userRequired, topic.de_collect); // 取消
 // 活动
 router.get('/activity/create', auth.userRequired, activity.create);
 router.get('/activity/:aid', auth.userRequired, activity.index);
-router.post('/activity/enroll', auth.userRequired, activity.enroll);
+router.post('/:aid/enroll', auth.userRequired, enrollment.add);
 
 router.post('/activity/create', auth.userRequired, limit.peruserperday('create_topic', config.create_post_per_day, false), activity.put);
 router.get('/activity/collect', auth.adminRequired, activity.getEnrollment);	//签到表, for admin

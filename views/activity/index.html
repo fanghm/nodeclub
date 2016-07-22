@@ -16,30 +16,14 @@
     <div class='header'>
       <span class='col_fade'>作者其它话题</span>
     </div>
-    <div class='inner'>
-      <% if (typeof(author_other_topics) !== 'undefined' && author_other_topics.length > 0) { %>
-      <ul class='unstyled'>
-        <%- partial('../topic/small', { collection: author_other_topics, as: 'topic' }) %>
-      </ul>
-      <% } else { %>
-      <p>无</p>
-      <% } %>
-    </div>
+    
   </div>
 
   <div class='panel'>
     <div class='header'>
       <span class='col_fade'>无人回复的话题</span>
     </div>
-    <div class='inner'>
-      <% if (typeof(no_reply_topics) !== 'undefined' && no_reply_topics.length > 0) { %>
-      <ul class='unstyled'>
-        <%- partial('../topic/small', { collection: no_reply_topics, as: 'topic' }) %>
-      </ul>
-      <% } else { %>
-      <p>无</p>
-      <% } %>
-    </div>
+    
   </div>
 </div>
 
@@ -96,16 +80,8 @@
             <% } %>
           </a>
 
-          <a href='/topic/<%= topic._id %>/lock' data-method="post">
-            <% if (topic.lock) { %>
-              <i class="fa fa-lg fa-unlock" title='取消锁定'></i>
-            <% } else { %>
-              <i class="fa fa-lg fa-lock" title='锁定（不可再回复）'/></i>
-            <% } %>
-          </a>
 
-
-          <a href='/topic/<%= topic._id %>/edit'>
+          <a href='/activity/<%= topic._id %>/edit'>
             <i class="fa fa-lg fa-pencil-square-o" title='编辑'></i></a>
           <a href='javascript:;'
              data-id="<%= topic._id %>"
@@ -113,7 +89,7 @@
              <i class="fa fa-lg fa-trash" title='删除'></i></a>
           <% } else { %>
           <% if (current_user._id.equals(topic.author_id)) { %>
-          <a href='/topic/<%= topic._id %>/edit'>
+          <a href='/activity/<%= topic._id %>/edit'>
             <i class="fa fa-lg fa-pencil-square-o" title='编辑'></i></a>
           <a href='javascript:;'
              data-id="<%= topic._id %>"
@@ -133,16 +109,50 @@
       </div>
     </div>
   </div>
-  <!--########## enrollments ###########-->
-  <% if (topic.enrollments && topic.enrollments.length > 0) { %>
+  <!--########## enrollment list ###########-->
+  <!--报名详细信息-->
+  <% if (current_user && typeof(topic) !== 'undefined') { %>
   <div class='panel'>
     <div class='header'>
-      <span class='col_fade'><%= topic.enrollments.length %> enrollments</span>
+      <span class='col_fade'>添加enrollment</span>
     </div>
-    <%- partial('../enrollment/enrollment2', topic.enrollments) %>
+
+    <div class='inner reply'>
+      <form role="form" id='reply_form' action='/<%= topic._id %>/enroll' method='post'>
+
+        <div class="form-group">
+          <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
+          <div class="col-sm-5">
+            <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '1000' %>" />
+          </div>
+          <!--label for="enroll_info" class="control-label">已报名名单</label-->
+        </div>
+
+        <div class="form-group">
+          <label for="option" class="control-label col-sm-2">填写报名名单*</label>
+          <div class="col-sm-5">
+            <input type="text" id="option" name="option" value="<%= typeof(option) !== 'undefined' && option || 'frank' %>" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact" class="control-label col-sm-2">填写联系方式*</label>
+          <div class="col-sm-5">
+            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="Enroll" >
+          <input type='hidden' name='_csrf' id="_csrf" value='<%= csrf %>'/>
+        </div>
+
+      </form>
+    </div>
   </div>
   <% } %>
 
+  <!--########## reply list ###########-->
   <% if (topic.replies && topic.replies.length > 0) { %>
   <div class='panel'>
     <div class='header'>
@@ -164,7 +174,8 @@
             <textarea class='editor' name='r_content' rows='8'></textarea>
 
             <div class='editor_buttons'>
-              <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="回复<%= topic.lock ? '(此主题已锁定)' : ''%>" <%= topic.lock ? 'disabled="disabled"' : ''%>>
+              <input class='span- primary submit_btn' type="submit" data-
+loading-text="回复中.." value="回复" > 
             </div>
           </div>
 

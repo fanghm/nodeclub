@@ -25,6 +25,8 @@ var UserSchema = new Schema({
   score: { type: Number, default: 0 },
   topic_count: { type: Number, default: 0 },
   reply_count: { type: Number, default: 0 },
+  activity_count: { type: Number, default: 0 }, // number of created activities
+  enroll_count: { type: Number, default: 0 },   // number of enrolled activities
   follower_count: { type: Number, default: 0 },
   following_count: { type: Number, default: 0 },
   collect_tag_count: { type: Number, default: 0 },

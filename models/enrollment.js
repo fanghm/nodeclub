@@ -22,7 +22,7 @@ var EnrollmentSchema = new Schema({
 });
 
 EnrollmentSchema.plugin(BaseModel);
-EnrollmentSchema.index({topic_id: 1});
+EnrollmentSchema.index({activity_id: 1});
 EnrollmentSchema.index({author_id: 1, create_at: -1});
 
 mongoose.model('Enrollment', EnrollmentSchema);

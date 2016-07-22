@@ -14,7 +14,7 @@ var config     = require('../config');
  * 添加回复
  */
 exports.add = function (req, res, next) {
-  var option = req.body.option;
+  var option  = req.body.option;
   var contact = req.body.contact;
   var balance = req.body.balance;
   var topic_id = req.params.aid;
@@ -34,7 +34,7 @@ exports.add = function (req, res, next) {
   ep.fail(next);
 
   console.log("0");
-  Activity.getActivity(topic_id, ep.doneLater(function (topic) {
+  Activity.getActivity(topic_id, ep.done(function (topic) { // doneLater
     console.log("1.0");
     if (!topic) {
       ep.unbind();
@@ -55,7 +55,7 @@ exports.add = function (req, res, next) {
     console.log("2.9");
   });
 
-  ep.all('topic', 'topic_author', function (topic, topicAuthor) {
+  ep.all('topic', 'topic_author', function (topic, topicAuthor) { //name????
     console.log("3.0");
     Enrollment.newAndSave(option, contact, balance, 0, topic_id, req.session.user._id, ep.done(function (reply) {
       //Activity.updateLastReply(topic_id, reply._id, ep.done(function () {
@@ -80,7 +80,8 @@ exports.add = function (req, res, next) {
   //   ep.emit('message_saved');
   // });
   console.log("4.0");
-  ep.all('reply_saved', 'topic', 'score_saved', function (reply) {
+  ep.all('reply_saved', 'score_saved', function (reply) {
+    console.log("reply._id: " + reply._id);
     res.redirect('/activity/' + topic_id + '#' + reply._id);
   });
   console.log("4.9");

@@ -8,17 +8,22 @@ if (config.debug) {
       if (err) {
         logger.error('traceMQuery error:', err)
       }
+
       var infos = [];
-      infos.push(query._collection.collection.name + "." + method.blue);
-      infos.push(JSON.stringify(info));
+      if (method.substring(0, 4) !== "find") {
+        infos.push("db." + query._collection.collection.name + "." + method.blue);
+        infos.push(JSON.stringify(info));
+      } else {
+        // TODO: *id within conditions should be converted to ObjectId
+        infos.push("db." + query._collection.collection.name + "." + method.blue
+          + "(" + JSON.stringify(info.conditions) + ", " + JSON.stringify(info.options) + ")" );
+      }
+      
       infos.push((millis + 'ms').green);
       
-      if (method !== 'findOne') {
-        infos.push('\n' + JSON.stringify(result).grey);
-        infos.push('\n\n');
-        //infos.push((JSON.parse(result).length + 'results').red);
-      }
-
+      infos.push('\n' + JSON.stringify(result).grey + '\n');
+      //infos.push((JSON.parse(result).length + 'results').red);
+      
       logger.debug("MONGO".magenta, infos.join(' '));
     };
   };
