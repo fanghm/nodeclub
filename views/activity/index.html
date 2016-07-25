@@ -103,13 +103,44 @@
       <% } %>
     </div>
     <div class='inner topic'>
-    ======= this is an activity! =======
+    ======= this is an activity! ======= <%= topic.enrollments.length.toString() %>
+    <% if (topic.enrollments && topic.enrollments.length > 0) { %>
+
+    <div><%= JSON.stringify(topic.enrollments[0]) %></div>
+
+    <% } %>
       <div class='topic_content'>
-        <%- markdown(topic.linkedContent) %>
+        <%- markdown(topic.content) %>
       </div>
     </div>
   </div>
   <!--########## enrollment list ###########-->
+  <% if (topic.enrollments && topic.enrollments.length > 0) { %>
+  <div class='panel'>
+    <div class='header'>
+      <span class='col_fade'><%= topic.enrollments.length %> enrollments</span>
+    </div>
+    <div class='inner reply'>
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nokia ID</th>
+            <th>Name</th>
+            <th>Enrollment Option</th>
+            <th>Contact</th>
+            <th>Enrollment Time</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%- partial('../enrollment/enrollment', topic.enrollments) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } %>
+
   <!--报名详细信息-->
   <% if (current_user && typeof(topic) !== 'undefined') { %>
   <div class='panel'>
@@ -167,7 +198,7 @@
       <span class='col_fade'>添加回复</span>
     </div>
     <div class='inner reply'>
-      <form id='reply_form' action='/<%= topic._id %>/reply' method='post'>
+      <form id='reply_form' action='/<%= topic._id %>/replyActivity' method='post'>
 
         <div class='markdown_editor in_editor'>
           <div class='markdown_in_editor'>
@@ -338,6 +369,7 @@ loading-text="回复中.." value="回复" >
             if ($me.hasClass('delete_reply2_btn')) {
               $me.closest('.reply2_item').remove();
             }
+            // TODO: also need update the N in panel header
           }
         }, 'json');
       }
@@ -373,6 +405,33 @@ loading-text="回复中.." value="回复" >
         }
       });
     // END 用户 hover 在回复框时才显示点赞按钮
+
+    // 删除enrollment
+    $('#content').on('click', '.delete_enrollment_btn', function (event) {
+      var $me = $(event.currentTarget);
+      reply_id = $me.closest('tr').attr('reply_id');
+      if (confirm('确定要删除此回复enrollment吗？' + reply_id)) {
+        //var reply_id = null;
+        //if ($me.hasClass('delete_enrollment_btn')) {
+          //reply_id = $me.closest('.reply_item').attr('reply_id');
+        //}
+
+        var data = {
+          reply_id: reply_id,
+          _csrf: "<%- csrf %>"
+        };
+        $.post('/enrollment/' + reply_id + '/delete', data, function (data) {
+          if (data.status === 'success') {
+            if ($me.hasClass('delete_enrollment_btn')) {
+              $me.closest('tr').remove();
+              // TODO: also need update the N in panel header - 'N enrollments'
+            }
+          }
+        }, 'json');
+      }
+      return false;
+    });
+    // END 删除enrollment
 
 
   });

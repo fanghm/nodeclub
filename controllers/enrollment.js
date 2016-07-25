@@ -60,6 +60,7 @@ exports.add = function (req, res, next) {
     Enrollment.newAndSave(option, contact, balance, 0, topic_id, req.session.user._id, ep.done(function (reply) {
       //Activity.updateLastReply(topic_id, reply._id, ep.done(function () {
         ep.emit('reply_saved', reply);
+        console.log("3.3");
       //}));
     }));
     console.log("3.5");
@@ -69,6 +70,7 @@ exports.add = function (req, res, next) {
       user.save();
       req.session.user = user;
       ep.emit('score_saved');
+      console.log("3.6");
     }));
     console.log("3.9");
   });
@@ -82,7 +84,42 @@ exports.add = function (req, res, next) {
   console.log("4.0");
   ep.all('reply_saved', 'score_saved', function (reply) {
     console.log("reply._id: " + reply._id);
+    console.log("5!");
     res.redirect('/activity/' + topic_id + '#' + reply._id);
   });
   console.log("4.9");
+};
+
+/**
+ * 删除回复信息
+ */
+exports.delete = function (req, res, next) {
+  var reply_id = req.body.reply_id;
+  Enrollment.getEnrollmentById(reply_id, function (err, reply) {
+    if (err) {
+      return next(err);
+    }
+
+    if (!reply) {
+      res.status(422);
+      res.json({status: 'no enrollment ' + reply_id + ' exists'});
+      return;
+    }
+
+    // only author and admin can delete
+    if (reply.author_id.toString() === req.session.user._id.toString() || req.session.user.is_admin) {
+      reply.deleted = true;
+      reply.save();
+      res.json({status: 'success'});
+
+      reply.author.score -= 5;
+      reply.author.enroll_count -= 1;
+      reply.author.save();
+    } else {
+      res.json({status: 'failed'});
+      return;
+    }
+
+    Activity.reduceCount(reply.activity_id, _.noop);
+  });
 };

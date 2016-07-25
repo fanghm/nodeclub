@@ -41,6 +41,7 @@ var ActivitySchema = new Schema({
   reply_count: { type: Number, default: 0 },
   visit_count: { type: Number, default: 0 },
   collect_count: { type: Number, default: 0 },  // 收藏 关注, ->follow?
+  enroll_count: { type: Number, default: 0 },   // TODO: udpate
 
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now },

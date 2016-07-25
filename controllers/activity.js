@@ -132,8 +132,10 @@ exports.index = function (req, res, next) {
     return reply.ups.indexOf(user._id) !== -1;
   }
 
+console.log("0:" + Date.now());
   var activity_id = req.params.aid;
   var currentUser = req.session.user;
+console.log("index:" + activity_id);
 
   if (activity_id.length !== 24) {
     return res.render404('此activity话题不存在或已被删除。');
@@ -142,18 +144,25 @@ exports.index = function (req, res, next) {
   var events = ['activity', 'is_collect'];
   var ep = EventProxy.create(events,
     function (activity, is_collect) { // /*other_activities, no_reply_activities,*/ 
+console.log("1:" + Date.now());
+
+console.log("1.1:" + JSON.stringify(activity));
     res.render('activity/index', {
       topic: activity,
       //author_other_topics: other_activities,
       //no_reply_topics: no_reply_activities,
-      is_uped: false, //isUped,
+      is_uped: isUped,
       is_collect: is_collect,
     });
+console.log("2:" + Date.now());
   });
 
   ep.fail(next);
 
+console.log("3:" + Date.now());
   Activity.getFullActivity(activity_id, ep.done(function (message, activity, author, replies, enrollments) {
+
+console.log("4:" + Date.now());
     if (message) {
       logger.error('getFullActivity error activity_id: ' + activity_id)
       return res.renderError(message);
@@ -180,6 +189,7 @@ exports.index = function (req, res, next) {
       return threshold;
     })();*/
 
+console.log("5:" + Date.now());
     ep.emit('activity', activity);
 
     /*/ get other_activitys
@@ -203,10 +213,13 @@ exports.index = function (req, res, next) {
     }));*/
   }));
 
+console.log("6:" + Date.now());
   if (!currentUser) {
     ep.emit('is_collect', null);
   } else {
+console.log("7:" + Date.now());
     TopicCollect.getTopicCollect(currentUser._id, activity_id, ep.done('is_collect'))
+console.log("8:" + Date.now());
   }
 };
 

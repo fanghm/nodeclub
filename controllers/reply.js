@@ -73,6 +73,70 @@ exports.add = function (req, res, next) {
 };
 
 /**
+ * 添加回复Activity
+ */
+exports.addActivity = function (req, res, next) {
+  var content = req.body.r_content;
+  var topic_id = req.params.topic_id;
+  var reply_id = req.body.reply_id;
+
+  var str = validator.trim(String(content));
+  if (str === '') {
+    return res.renderError('回复内容不能为空!', 422);
+  }
+
+  var ep = EventProxy.create();
+  ep.fail(next);
+
+  Topic.getTopic(topic_id, ep.doneLater(function (topic) {
+    if (!topic) {
+      ep.unbind();
+      // just 404 page
+      return next();
+    }
+
+    if (topic.lock) {
+      return res.status(403).send('此主题已锁定。');
+    }
+    ep.emit('topic', topic);
+  }));
+
+  ep.all('topic', function (topic) {
+    User.getUserById(topic.author_id, ep.done('topic_author'));
+  });
+
+  ep.all('topic', 'topic_author', function (topic, topicAuthor) {
+    Reply.newAndSave(content, topic_id, req.session.user._id, reply_id, ep.done(function (reply) {
+      Topic.updateLastReply(topic_id, reply._id, ep.done(function () {
+        ep.emit('reply_saved', reply);
+        //发送at消息，并防止重复 at 作者
+        //var newContent = content.replace('@' + topicAuthor.loginname + ' ', '');
+        //at.sendMessageToMentionUsers(newContent, topic_id, req.session.user._id, reply._id);
+      }));
+    }));
+
+    User.getUserById(req.session.user._id, ep.done(function (user) {
+      user.score += 5;
+      user.reply_count += 1;
+      user.save();
+      req.session.user = user;
+      ep.emit('score_saved');
+    }));
+  });
+/*
+  ep.all('reply_saved', 'topic', function (reply, topic) {
+    if (topic.author_id.toString() !== req.session.user._id.toString()) {
+      message.sendReplyMessage(topic.author_id, req.session.user._id, topic._id, reply._id);
+    }
+    ep.emit('message_saved');
+  });*/
+
+  ep.all('reply_saved', 'score_saved', function (reply) {
+    res.redirect('/activity/' + topic_id + '#' + reply._id);
+  });
+};
+
+/**
  * 删除回复信息
  */
 exports.delete = function (req, res, next) {

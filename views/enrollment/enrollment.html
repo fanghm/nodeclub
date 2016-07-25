@@ -1,37 +1,22 @@
-  <table class="table table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Nokia ID</th>
-        <th>Name</th>
-        <th>Enrollment Option</th>
-        <th>Contact</th>
-        <th>Enrollment Time</th>
-        <th>Operations</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class='reply_item'>
-        <td><%= indexInCollection + 1 %></td>
-        <td><%= enrollment.author.loginname %></td>
-        <td><%= enrollment.author.name %></td>
-        <td><%= enrollment.option %></td>
-        <td><%= enrollment.contact %></td>
-        <td><%= enrollment.create_at %></td>
-        <td>
-      <% if (current_user && current_user.is_admin ||
-      (current_user && current_user._id.toString() == reply.author._id.toString())
-      ) { %>
-          <div class='user_action'>
-            <a href='/reply/<%= enrollment._id %>/edit' class='edit_reply_btn'>
-              <i class="fa fa-pencil-square-o" title='编辑'></i>
-            </a>
-            <a href='javascript:void(0);' class='delete_reply_btn'>
-              <i class="fa fa-trash" title='删除'></i>
-            </a>
-          </div>
-      <% } %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<tr reply_item reply_id="<%= enrollment._id %>" >
+  <td><%= indexInCollection + 1 %></td>
+  <td><%= enrollment.author.loginname %></td>
+  <td><%= enrollment.balance %></td>
+  <td><%= enrollment.option %></td>
+  <td><%= enrollment.contact %></td>
+  <td><%= enrollment.create_at %></td>
+  <td>
+    <% if (current_user && current_user.is_admin ||
+    (current_user && current_user._id.toString() == enrollment.author._id.toString())
+    ) { %>
+        <div class='user_action'>
+          <a href='/enrollment/<%= enrollment._id %>/edit' class='edit_reply_btn'>
+            <i class="fa fa-pencil-square-o" title='编辑'></i>
+          </a>
+          <a href='javascript:void(0);' class='delete_enrollment_btn'>
+            <i class="fa fa-trash" title='删除'></i>
+          </a>
+        </div>
+    <% } %>
+  </td>
+</tr>

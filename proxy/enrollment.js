@@ -14,19 +14,24 @@ var at         = require('../common/at');
  * @param {Function} callback 回调函数
  */
 exports.getEnrollmentsByActivityId = function (id, cb) {
+console.log("getEnrollmentsByActivityId0:" + Date.now());
   Enrollment.find({activity_id: id, deleted: false}, '', {sort: 'create_at'}, function (err, enrollments) {
     if (err) {
       return cb(err);
     }
     if (enrollments.length === 0) {
+console.log("getEnrollmentsByActivityId - return 0:" + Date.now());
       return cb(null, []);
     } else {
-      cb(null, enrollments);
+      //cb(null, enrollments);
+console.log("getEnrollmentsByActivityId - return " + enrollments.length);
     }
-/*
+//*
     var proxy = new EventProxy();
     proxy.after('enrollment_find', enrollments.length, function () {
+console.log("getEnrollmentsByActivityId1:" + Date.now());
       cb(null, enrollments);
+console.log("getEnrollmentsByActivityId2:" + Date.now());
     });
     for (var j = 0; j < enrollments.length; j++) {
       (function (i) {
@@ -36,19 +41,52 @@ exports.getEnrollmentsByActivityId = function (id, cb) {
             return cb(err);
           }
           enrollments[i].author = author || { _id: '' };
-          if (enrollments[i].content_is_html) {
+          //if (enrollments[i].content_is_html) {
             return proxy.emit('enrollment_find');
-          }
+          //}
+          /*
           at.linkUsers(enrollments[i].content, function (err, str) {
             if (err) {
               return cb(err);
             }
             enrollments[i].content = str;
             proxy.emit('enrollment_find');
-          });
+          });*/
         });
       }) (j);
-    }*/
+    }//*/
+  });
+};
+
+/**
+ * 根据回复ID，获取回复
+ * Callback:
+ * - err, 数据库异常
+ * - reply, 回复内容
+ * @param {String} id 回复ID
+ * @param {Function} callback 回调函数
+ */
+exports.getEnrollmentById = function (id, callback) {
+  if (!id) {
+    return callback(null, null);
+  }
+  Enrollment.findOne({_id: id}, function (err, reply) {
+    if (err) {
+      return callback(err);
+    }
+    if (!reply) {
+      return callback(err, null);
+    }
+
+    var author_id = reply.author_id;
+    User.getUserById(author_id, function (err, author) {
+      if (err) {
+        return callback(err);
+      }
+      reply.author = author;
+      return callback(null, reply);
+      
+    });
   });
 };
 
