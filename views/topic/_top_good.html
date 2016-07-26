@@ -1,4 +1,6 @@
-<% if (topic.top) { %>
+<% if (topic.is_activity) { %>
+<span class='put_top'>activity</span>
+<% } else if (topic.top) { %>
 <span class='put_top'>置顶</span>
 <% } else if (topic.good) { %>
 <span class='put_good'>精华</span>

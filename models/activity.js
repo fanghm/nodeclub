@@ -34,14 +34,15 @@ var ActivitySchema = new Schema({
   
   comment: { type: String },  // 其他注意事项
   
-  top: { type: Boolean, default: false },       // 置顶帖
-  good: {type: Boolean, default: false},        // 精华帖
+  is_activity: { type: Boolean, default: true },  // 活动帖
+  top: { type: Boolean, default: false },         // 置顶帖
+  good: {type: Boolean, default: false},          // 精华帖
   ups: [Schema.Types.ObjectId],
   //lock: {type: Boolean, default: false},        // 被锁定主题 auto-lock after deadline?
   reply_count: { type: Number, default: 0 },
   visit_count: { type: Number, default: 0 },
-  collect_count: { type: Number, default: 0 },  // 收藏 关注, ->follow?
-  enroll_count: { type: Number, default: 0 },   // TODO: udpate
+  collect_count: { type: Number, default: 0 },    // 收藏 关注, ->follow?
+  enroll_count: { type: Number, default: 0 },     // TODO: udpate
 
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now },

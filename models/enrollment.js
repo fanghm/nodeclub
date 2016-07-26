@@ -10,7 +10,10 @@ var EnrollmentSchema = new Schema({
   //nokia_id: { type: String },	// employee ID
   option: { type: String },
   contact: { type: String },  // 联系人及方法
-
+  attendance: { type: Number, default: 1 },  // 报名人数
+  email: { type: String},
+  mobile: { type: String},
+  
   fee: { type: Number, default: 0 },	// for freezing
   balance: { type: Number },	// current available balance before freezing
 

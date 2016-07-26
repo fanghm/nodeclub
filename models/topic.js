@@ -12,12 +12,13 @@ var TopicSchema = new Schema({
   title: { type: String },
   content: { type: String },
 
-  top: { type: Boolean, default: false },       // 置顶帖
-  good: {type: Boolean, default: false},        // 精华帖
-  lock: {type: Boolean, default: false},        // 被锁定主题
+  is_activity: { type: Boolean, default: false }, // 活动帖
+  top: { type: Boolean, default: false },         // 置顶帖
+  good: {type: Boolean, default: false},          // 精华帖
+  lock: {type: Boolean, default: false},          // 被锁定主题
   reply_count: { type: Number, default: 0 },
   visit_count: { type: Number, default: 0 },
-  collect_count: { type: Number, default: 0 },  // 收藏 关注, ->follow?
+  collect_count: { type: Number, default: 0 },    // 收藏 关注, ->follow?
 
   create_at: { type: Date, default: Date.now },
   update_at: { type: Date, default: Date.now },

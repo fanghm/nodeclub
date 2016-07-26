@@ -1,5 +1,11 @@
 <div class='cell'>
 
+  <%
+    var post = 'topic';
+    if (topic.is_activity) {
+      post = 'activity';
+    }
+  %>
   <a class="user_avatar pull-left" href="/user/<%= topic.author.loginname %>">
     <img src="<%= proxy(topic.author.avatar_url) %>"
          title="<%= topic.author.loginname %>"
@@ -17,7 +23,7 @@
   </span>
 
   <% if (topic.reply && topic.reply.author) {%>
-  <a class='last_time pull-right' href="/topic/<%= topic._id %><%- '#' + topic.reply._id %>">
+  <a class='last_time pull-right' href="/<%= post %>/<%= topic._id %><%- '#' + topic.reply._id %>">
     <img class="user_small_avatar" src="<%= proxy(topic.reply.author.avatar_url) %>">
     <span class="last_active_time"><%= topic.reply.create_at_ago() %></span>
   </a>
@@ -29,10 +35,9 @@
   <% } %>
 
   <div class="topic_title_wrapper">
-
     <%- partial('./_top_good', {topic: topic}) %>
 
-    <a class='topic_title' href='/topic/<%= topic._id %>' title='<%= topic.title %>'>
+    <a class='topic_title' href='/<%= post %>/<%= topic._id %>' title='<%= topic.title %>'>
       <%= topic.title %>
     </a>
   </div>

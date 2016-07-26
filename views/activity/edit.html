@@ -12,12 +12,13 @@
         <% } %>
       </ol>
     </div>
+
     <div class='inner post'>    
       <% if(typeof(edit_error) !== 'undefined' && edit_error){ %>
         <div class="alert alert-error">
-        <a class="close" data-dismiss="alert" href="#">&times;</a>
-        <strong><%= edit_error %></strong>
-      </div>
+          <a class="close" data-dismiss="alert" href="#">&times;</a>
+          <strong><%= edit_error %></strong>
+        </div>
       <% } %>
 
       <% if(typeof(error) !== 'undefined' && error){ %>
@@ -26,103 +27,123 @@
       </div>
       <% }else{ %>
       <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
-        <form id='create_topic_form' action='/activity/<%= topic_id %>/edit' method='post'>
+        <form class="form-horizontal" id='create_topic_form' action='/activity/<%= topic_id %>/edit' method='post'>
       <% } else { %>
-        <form id='create_topic_form' action='/activity/create' method='post'>
-          <% } %>
+        <form class="form-horizontal" id='create_topic_form' action='/activity/create' method='post'>
+      <% } %>
 
           <fieldset>
-            <span class="tab-selector">选择版块：</span>
-            <select name="tab" id="tab-value">
-              <option value="">请选择</option>
-              <%
-              var tabValue = '';
-              if (typeof(tab) !== 'undefined') {
-                tabValue = tab;
-              }
-              tabs.forEach(function (pair) {
-                var value = pair[0];
-                var text = pair[1];
+            <div class="control-group">
+              <label for="tab-value" class="control-label tab-selector">选择版块：</label>
+
+              <!--span class="tab-selector">选择版块：</span-->
+              <select name="tab" id="tab-value">
+                <option value="">请选择</option>
+                <%
+                var tabValue = '';
+                if (typeof(tab) !== 'undefined') {
+                  tabValue = tab;
+                }
+                tabs.forEach(function (pair) {
+                  var value = pair[0];
+                  var text = pair[1];
                 %>
                 <option value="<%=value%>" <%= tabValue === value ? 'selected': '' %>><%=text%></option>
-
-              <%});%>
-            </select>
-
-            <span id="topic_create_warn"></span>
+                <%});%>
+              </select>
+            </div>
 
 <!--活动详细信息-->
+          <div class="control-group">
             <label for="title" class="control-label">活动主题*</label>
-            <textarea autofocus class='span9' id='title' name='title' rows='1'
-                      placeholder="标题字数 10 字以上"
-                    ><%= typeof(title) !== 'undefined' && title || 'test topic - ' %></textarea>
+            <input class="span11" autofocus id="title" name='title' type="text" placeholder="" value="<%= typeof(title) !== 'undefined' && title || '' %>" required/>
+          </div>
 
+          <div class="control-group">
             <label for="category" class="control-label">活动类型*</label>
             <select id='category' name='category'>
               <option value="badminton">Badminton</option>
               <option value="basketball">Basketball</option>
               <option value="hiking" selected>Hiking</option>
             </select>
+          </div>
 
+          <div class="control-group">
             <label for="repeats" class="control-label">期数*</label>
-            <input type="number" id='repeats' name='repeats' min=1 value="<%= typeof(repeats) !== 'undefined' && repeats || '1' %>" />
+            <input type="number" id='repeats' name='repeats' min=1 value="<%= typeof(repeats) !== 'undefined' && repeats || '1' %>" required/>
+          </div>
 
-            <label for="t_content" class="control-label">活动内容描述*</label>
+          <div class="control-group">
+            <label for="total" class="control-label">活动总人数限制*</label>
+            <input type="number" id="total" name="total" min=0 value="<%= typeof(total) !== 'undefined' && total || '0' %>" required/>(0 - no limit) 
+          </div>
+
+          <div class="control-group">
+            <label for="limit" class="control-label">每人报名人数限制*</label>
+            <input type="number" id="limit" name="limit" min=1 value="<%= typeof(limit) !== 'undefined' && limit || '1' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="address" class="control-label">活动地点*</label>
+            <input type="text" id='address' name='address' value="<%= typeof(address) !== 'undefined' && address || 'hztc' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="contact" class="control-label">联系人及方法*</label>
+            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
+            <label class="radio inline"><input type="radio" name="need_pay" value="1" >Yes</label>
+            <label class="radio inline"><input type="radio" name="need_pay" value="0" checked >No</label>
+          </div>  
+
+          <div class="control-group" id="4expense" style="display: none;">
+            <label for="expense" class="control-label">活动费用*</label>
+              <input type="text" id="expense" name="expense" value="<%= typeof(expense) !== 'undefined' && expense || '0' %>" required/>费用格式：<会员男>/<会员女>/<非会员男>/<非会员女>/<超过名额男>/<超过名额女> 
+          </div>
+
+          <div class="control-group">
+            <label for="start_date" class="control-label">活动开始时间*</label>
+            <input type="text" id="start_date" name="start_date" value="<%= typeof(start_date) !== 'undefined' && start_date || '2016/06/20 14:00' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="end_date" class="control-label">活动结束时间*</label>
+            <input type="text" id="end_date" name="end_date" value="<%= typeof(end_date) !== 'undefined' && end_date || '2016/07/20 14:00' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="regret_date" class="control-label">活动退票截止时间*</label>
+            <input type="text" id="regret_date" name="regret_date" value="<%= typeof(regret_date) !== 'undefined' && regret_date || '2016/07/20 14:00' %>" required/>
+          </div>
+
+          <div class="control-group">
+            <label for="deadline" class="control-label">活动报名截止时间*</label>
+            <input type="text" id="deadline" name="deadline" value="<%= typeof(deadline) !== 'undefined' && deadline || '2016/07/20 14:00' %>" required/>
+          </div>
+
+          <div class="control-group">            
             <div class='markdown_editor in_editor'>
               <div class='markdown_in_editor'>
-                <textarea class='editor' name='t_content' rows='3'
-                          placeholder='文章支持 Markdown 语法, 请注意标记代码'
-                        ><%= typeof(content) !== 'undefined' && content || 'welcome to test...' %></textarea>
+                <textarea class='editor2' name='t_content' id='t_content' rows='3' 
+                      placeholder='文章支持 Markdown 语法, 请注意标记代码' required
+                    ><%= typeof(content) !== 'undefined' && content || 'welcome to test...' %></textarea>
               </div>
             </div>
+          </div>
 
-            <label for="total" class="control-label">活动总人数限制*</label>
-            <input type="number" id="total" name="total" min=0 value="<%= typeof(total) !== 'undefined' && total || '0' %>" />(0 - no limit) 
-
-            <label for="limit" class="control-label">每人报名人数限制*</label>
-            <input type="number" id="limit" name="limit" min=1 value="<%= typeof(limit) !== 'undefined' && limit || '1' %>" />
-
-            <label for="address" class="control-label">活动地点*</label>
-            <textarea class='span9' id='address' name='address' rows='1' placeholder="address"
-                    ><%= typeof(address) !== 'undefined' && address || 'hztc' %></textarea>
-
-            <label for="contact" class="control-label">联系人及方法*</label>
-            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" />
-
-            <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
-            <label class="radio-inline"><input type="radio" name="need_pay" value="0" checked >No</label>
-            <label class="radio-inline"><input type="radio" name="need_pay" value="1" >Yes</label>
-
-            <div id="4expense" style="display: none;">
-              <label for="expense" class="control-label">活动费用*</label>
-              <input type="text" id="expense" name="expense" value="<%= typeof(expense) !== 'undefined' && expense || '0' %>" />费用格式：<会员男>/<会员女>/<非会员男>/<非会员女>/<超过名额男>/<超过名额女> 
-            </div>
-
-            <label for="start_date" class="control-label">活动开始时间*</label>
-            <input type="text" id="start_date" name="start_date" value="<%= typeof(start_date) !== 'undefined' && start_date || '2016/06/20 14:00' %>" />
-            <label for="end_date" class="control-label">活动结束时间*</label>
-            <input type="text" id="end_date" name="end_date" value="<%= typeof(end_date) !== 'undefined' && end_date || '2016/07/20 14:00' %>" />
-            <label for="regret_date" class="control-label">活动退票截止时间*</label>
-            <input type="text" id="regret_date" name="regret_date" value="<%= typeof(regret_date) !== 'undefined' && regret_date || '2016/07/20 14:00' %>" />
-            <label for="deadline" class="control-label">活动报名截止时间*</label>
-            <input type="text" id="deadline" name="deadline" value="<%= typeof(deadline) !== 'undefined' && deadline || '2016/07/20 14:00' %>" />
-            
-
-            <label for="comment" class="control-label">其他注意事项</label>
-            <textarea class='span9' id='comment' name='comment' rows='3'
-                    ><%= typeof(comment) !== 'undefined' && comment || 'NA' %></textarea>
-
-            <input type='hidden' id='topic_tags' name='topic_tags' value=''>
-            <input type='hidden' name='_csrf' value='<%= csrf %>'>
-
-            <div class='editor_buttons'>
+          <div class="control-group">
+            <div class="controls editor_buttons">
+              <input type='hidden' id='topic_tags' name='topic_tags' value=''>
+              <input type='hidden' name='_csrf' value='<%= csrf %>'>
               <input type="submit" class='span-primary submit_btn' data-loading-text="提交中"
-                     value="Save">
-              <input type="reset" class='span-primary submit_btn' data-loading-text="提交中"
-                     value="Reset">
+                       value="Save">
+              <input type="reset" class='span-primary submit_btn' value="Reset">
             </div>
+          </div>
 
-<!--本人报名人员：10，其中正在排队人员：10 (红色区域为排队人员)-->
           </fieldset>
         </form>
     </div>
@@ -157,7 +178,7 @@
 
     // -------------------------------------
     var editor = new Editor();
-    editor.render($('.editor')[0]);
+    editor.render($('.editor')[1]);
 
     // 版块选择的检查，必须选择
     $('#create_topic_form').on('submit', function (e) {
@@ -172,7 +193,7 @@
     // END 版块选择的检查，必须选择
 
     // 选择招聘版块时，给出提示
-    $('#tab-value').on('change', function () {
+/*    $('#tab-value').on('change', function () {
       var $this = $(this);
       var value = $this.val();
       var warnMsg = '';
@@ -182,7 +203,7 @@
         warnMsg = '<strong>提问时，请遵循 <a href="http://doc.zengrong.net/smart-questions/cn.html" target="_blank">《提问的智慧》</a>中提及的要点，以便您更接收到高质量回复。</strong>'
       }
       $('#topic_create_warn').html(warnMsg);
-    });
+    });*/
     // END 选择招聘版块时，给出提示
   })();
 </script>

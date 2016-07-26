@@ -103,25 +103,20 @@
       <% } %>
     </div>
     <div class='inner topic'>
-    ======= this is an activity! ======= <%= topic.enrollments.length.toString() %>
-    <% if (topic.enrollments && topic.enrollments.length > 0) { %>
-
-    <div><%= JSON.stringify(topic.enrollments[0]) %></div>
-
-    <% } %>
       <div class='topic_content'>
         <%- markdown(topic.content) %>
       </div>
     </div>
   </div>
   <!--########## enrollment list ###########-->
+  <!--TODO: 本人报名人员：10，其中正在排队人员：10 (红色区域为排队人员): tr class="error"-->
   <% if (topic.enrollments && topic.enrollments.length > 0) { %>
   <div class='panel'>
     <div class='header'>
-      <span class='col_fade'><%= topic.enrollments.length %> enrollments</span>
+      <span class='col_fade'><%= topic.enrollments.length %> enrolled, x on standby</span>
     </div>
     <div class='inner reply'>
-      <table class="table table-condensed">
+      <table class="table table-striped table-condensed">
         <thead>
           <tr>
             <th>#</th>
@@ -170,6 +165,13 @@
           <label for="contact" class="control-label col-sm-2">填写联系方式*</label>
           <div class="col-sm-5">
             <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="control-label col-sm-2">填写email*</label>
+          <div class="col-sm-5">
+            <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || 'frank@test.com' %>" />
           </div>
         </div>
 
