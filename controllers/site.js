@@ -23,6 +23,10 @@ exports.index = function (req, res, next) {
   page = page > 0 ? page : 1;
   var tab = req.query.tab || 'all';
 
+  if (null === req.session.tab || req.session.tab !== tab) {
+    req.session.tab = tab;
+  }
+
   var proxy = new eventproxy();
   proxy.fail(next);
 
@@ -101,7 +105,7 @@ exports.index = function (req, res, next) {
         tops: tops,
         no_reply_topics: no_reply_topics,
         pages: pages,
-        tabs: config.tabs,
+        //tabs: config.tabs,
         tab: tab,
         pageTitle: tabName && (tabName + '版块'),
       });

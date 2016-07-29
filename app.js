@@ -90,7 +90,7 @@ app.use(helmet.frameguard('sameorigin'));
 app.use(bodyParser.json({limit: '1mb'}));
 app.use(bodyParser.urlencoded({ extended: true, limit: '1mb' }));
 app.use(require('method-override')());
-app.use(require('cookie-parser')(config.session_secret));
+app.use(require('cookie-parser')(config.session_secret));   // needless since express-session v1.5.0
 app.use(compress());
 app.use(session({
   secret: config.session_secret,
@@ -101,6 +101,13 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+
+// enable accessing session from all views
+app.use(function(req,res,next){
+    res.locals.session = req.session;
+    res.locals.tabs = config.tabs;
+    next();
+});
 
 // oauth 中间件
 app.use(passport.initialize());

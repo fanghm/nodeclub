@@ -37,7 +37,10 @@
               var tabValue = '';
               if (typeof(tab) !== 'undefined') {
                 tabValue = tab;
+              } else if (session.tab && session.tab !== 'undefined'){
+                tabValue = session.tab;
               }
+
               tabs.forEach(function (pair) {
                 var value = pair[0];
                 var text = pair[1];
@@ -46,6 +49,7 @@
 
               <%});%>
             </select>
+
             <span id="topic_create_warn"></span>
             <textarea autofocus class='span9' id='title' name='title' rows='1'
                       placeholder="标题字数 10 字以上"
