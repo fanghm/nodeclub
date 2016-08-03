@@ -57,7 +57,6 @@
               tabValue = tab;
             } else if (session.tab && session.tab !== 'undefined'){
               tabValue = session.tab;
-              console.log("Session2: " + JSON.stringify(session.tab));
             }
 
             tabs.forEach(function (pair) {
@@ -68,16 +67,17 @@
 
             <%});%>
           </select>
-        </form>
 
-        <div class="pull-right">
-          <a href='/topic/create' id='create_topic_btn'>
-            <span class='span-success'>发布话题</span>
-          </a>
-          <a href='/activity/create' id='create_event_btn'>
-            <span class='span-success'>发布activity</span>
-          </a>
-        </div>
+          <div class="pull-right">
+            <a href='/topic/create' id='create_topic_btn'>
+              <span class='span-success'>发布话题</span>
+            </a>
+            <a href='/activity/create' id='create_event_btn'>
+              <span class='span-success'>发布活动</span>
+            </a>
+          </div>
+
+        </form>
       </span>
     </div>
   </div>
@@ -106,7 +106,7 @@
           </span>
         <% } %>
         <% if (topic.tab) { %>
-          <span> 来自 <%= topic.tabName %></span>
+          <span> 来自 <a href="/?tab=<%= session.tab %>"> <%= topic.tabName %></span> </a>
         <%}%>
 
         <% if (current_user) { %>

@@ -52,7 +52,7 @@
           </span>
         <% } %>
         <% if (topic.tab) { %>
-          <span> 来自 <%= topic.tabName %></span>
+          <span> 来自 <a href="/?tab=<%= session.tab %>"> <%= topic.tabName %></span> </a>
         <%}%>
 
         <% if (current_user) { %>
@@ -103,8 +103,62 @@
       <% } %>
     </div>
     <div class='inner topic'>
-      <div class='topic_content'>
-        <%- markdown(topic.content) %>
+      <div class='activity_content'>
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th>活动类型</th>
+            <td><%= topic.category %></td>
+          </tr>
+          <tr>
+            <th>期数</th>
+            <td><%= topic.repeats %></td>
+          </tr>
+          <tr>
+            <th>活动总人数限制</th>
+            <td><%= topic.total %></td>
+          </tr>
+          <tr>
+            <th>每人报名人数限制</th>
+            <td><%= topic.limit %></td>
+          </tr>
+          <tr>
+            <th>活动地点</th>
+            <td><%= topic.address %></td>
+          </tr>
+          <tr>
+            <th>联系人及方法</th>
+            <td><%= topic.contact %></td>
+          </tr>
+          <tr>
+            <th>是否俱乐部收费活动</th>
+            <td><%= topic.need_pay %></td>
+          </tr>
+          <tr>
+            <th>活动费用</th>
+            <td><%= topic.need_pay?topic.expense:0 %></td>
+          </tr>
+          <tr>
+            <th>活动开始时间</th>
+            <td><%= topic.start_date %></td>
+          </tr>
+          <tr>
+            <th>活动结束时间</th>
+            <td><%= topic.end_date %></td>
+          </tr>
+          <tr>
+            <th>活动退票截止时间</th>
+            <td><%= topic.regret_date %></td>
+          </tr>
+          <tr>
+            <th>活动报名截止时间</th>
+            <td><%= topic.deadline %></td>
+          </tr>
+          <tr>
+            <th>活动details</th>
+            <td><%- markdown(topic.content) %></td>
+          </tr>
+        </table>
+
       </div>
     </div>
   </div>

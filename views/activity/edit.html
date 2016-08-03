@@ -6,9 +6,9 @@
       <ol class='breadcrumb'>
         <li><a href='/'>主页</a><span class='divider'>/</span></li>
         <% if(typeof(action) !== 'undefined' && action == 'edit'){ %>
-          <li class='active'>编辑话题</li>
+          <li class='active'>编辑活动</li>
         <% }else{ %>
-          <li class='active'>发布话题</li>
+          <li class='active'>发布活动</li>
         <% } %>
       </ol>
     </div>
@@ -27,44 +27,56 @@
       </div>
       <% }else{ %>
       <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
-        <form class="form-horizontal" id='create_topic_form' action='/activity/<%= topic_id %>/edit' method='post'>
+        <form class="form-horizontal" id='create_topic_form' action='/activity/<%= _id %>/edit' method='post'>
       <% } else { %>
         <form class="form-horizontal" id='create_topic_form' action='/activity/create' method='post'>
       <% } %>
 
           <fieldset>
             <div class="control-group">
-              <label for="tab-value" class="control-label tab-selector">选择版块：</label>
+              <label for="tab-value" class="control-label tab-selector">版块：</label>
 
               <!--span class="tab-selector">选择版块：</span-->
-              <select name="tab" id="tab-value">
+              <select name="tab" id="tab-value" autofocus>
                 <option value="">请选择</option>
                 <%
                 var tabValue = '';
                 if (typeof(tab) !== 'undefined') {
                   tabValue = tab;
+                } else if (session.tab && session.tab !== 'undefined'){
+                  tabValue = session.tab;
                 }
+
+                var activity; // default activity of the board
                 tabs.forEach(function (pair) {
                   var value = pair[0];
                   var text = pair[1];
                 %>
-                <option value="<%=value%>" <%= tabValue === value ? 'selected': '' %>><%=text%></option>
+                <option value="<%=value%>" <%= tabValue === value ? (activity=pair[2], 'selected'): '' %>><%=text%></option>
                 <%});%>
               </select>
             </div>
 
-<!--活动详细信息-->
+          <!--活动详细信息-->
           <div class="control-group">
             <label for="title" class="control-label">活动主题*</label>
-            <input class="span11" autofocus id="title" name='title' type="text" placeholder="" value="<%= typeof(title) !== 'undefined' && title || '' %>" required/>
+            <input class="span11" id="title" name='title' type="text" placeholder="" value="<%= typeof(title) !== 'undefined' && title || '' %>" required/>
           </div>
 
           <div class="control-group">
             <label for="category" class="control-label">活动类型*</label>
             <select id='category' name='category'>
-              <option value="badminton">Badminton</option>
-              <option value="basketball">Basketball</option>
-              <option value="hiking" selected>Hiking</option>
+              <option value="">请选择</option>
+              <%
+                if (typeof category !== 'undefined') { // edit mode 
+                  activity = category;
+                }
+
+                tabs.forEach(function (pair) {
+                  var text = pair[2];
+                %>
+                <option value="<%=text%>" <%= (activity === text) ? 'selected': '' %>><%=text%></option>
+                <%});%>
             </select>
           </div>
 
@@ -95,13 +107,16 @@
 
           <div class="control-group">
             <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
-            <label class="radio inline"><input type="radio" name="need_pay" value="1" >Yes</label>
-            <label class="radio inline"><input type="radio" name="need_pay" value="0" checked >No</label>
+            <label class="radio inline"><input type="radio" name="need_pay" value="1" 
+              <%= (typeof(need_pay) !== 'undefined' && need_pay == true) ? 'checked' : '' %> >&nbsp;Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <label class="radio inline"><input type="radio" name="need_pay" value="0"
+              <%= (typeof(need_pay) === 'undefined' || need_pay !== true) ? 'checked' : '' %> >&nbsp;No</label>
           </div>  
 
-          <div class="control-group" id="4expense" style="display: none;">
+          <div class="control-group" id="4expense" 
+            style="<%= (typeof(need_pay) === 'undefined' || need_pay !== true) ? 'display:none;' : ''%>" >
             <label for="expense" class="control-label">活动费用*</label>
-              <input type="text" id="expense" name="expense" value="<%= typeof(expense) !== 'undefined' && expense || '0' %>" required/>费用格式：<会员男>/<会员女>/<非会员男>/<非会员女>/<超过名额男>/<超过名额女> 
+              <input type="text" id="expense" name="expense" value="<%= typeof(expense) !== 'undefined' && expense || '0' %>" required/>(格式：会员男/会员女/非会员男/非会员女/超过名额男/超过名额女)
           </div>
 
           <div class="control-group">

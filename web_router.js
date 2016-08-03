@@ -92,7 +92,9 @@ router.post('/topic/de_collect', auth.userRequired, topic.de_collect); // 取消
 // 活动
 router.get('/activity/create', auth.userRequired, activity.create);
 router.get('/activity/:aid', auth.userRequired, activity.index);
+router.get('/activity/:aid/edit', auth.userRequired, activity.showEdit);  // 编辑某活动
 
+router.post('/activity/:aid/edit', auth.userRequired, activity.update);
 router.post('/activity/create', auth.userRequired, limit.peruserperday('create_topic', config.create_post_per_day, false), activity.put);
 router.get('/activity/collect', auth.adminRequired, activity.getEnrollment);	//签到表, for admin
 router.get('/activity/list', auth.userRequired, activity.list);	// 活动list

@@ -20,6 +20,7 @@ var ActivitySchema = new Schema({
 
   need_pay: { type: Boolean, default: false }, // 是否俱乐部收费活动
   // 活动费用: <会员男>/<会员女>/<非会员男>/<非会员女>/<超过名额男>/<超过名额女> 
+  expense: { type: String },
   fee_man: { type: Number, default: 0 },
   fee_woman: { type: Number, default: 0 },
   fee_man_nonmember: { type: Number, default: 0 },

@@ -40,9 +40,9 @@ $(document).ready(function () {
   prettyPrint();
 
   // data-loading-text="提交中"
-  $('.submit_btn').click(function () {
+/*  $('.submit_btn').click(function () {
     $(this).button('loading');
-  });
+  });*/
 
   // 广告的统计信息
   $('.sponsor_outlink').click(function () {
