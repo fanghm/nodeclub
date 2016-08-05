@@ -20,18 +20,14 @@ console.log("getEnrollmentsByActivityId0:" + Date.now());
       return cb(err);
     }
     if (enrollments.length === 0) {
-console.log("getEnrollmentsByActivityId - return 0:" + Date.now());
       return cb(null, []);
     } else {
       //cb(null, enrollments);
-console.log("getEnrollmentsByActivityId - return " + enrollments.length);
     }
-//*
+
     var proxy = new EventProxy();
     proxy.after('enrollment_find', enrollments.length, function () {
-console.log("getEnrollmentsByActivityId1:" + Date.now());
       cb(null, enrollments);
-console.log("getEnrollmentsByActivityId2:" + Date.now());
     });
     for (var j = 0; j < enrollments.length; j++) {
       (function (i) {

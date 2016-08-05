@@ -27,7 +27,7 @@
       </div>
       <% }else{ %>
       <% if (typeof(action) !== 'undefined' && action === 'edit') { %>
-        <form class="form-horizontal" id='create_topic_form' action='/activity/<%= _id %>/edit' method='post'>
+        <form class="form-horizontal" id='create_topic_form' action='/activity/<%= activity_id %>/edit' method='post'>
       <% } else { %>
         <form class="form-horizontal" id='create_topic_form' action='/activity/create' method='post'>
       <% } %>
@@ -207,18 +207,20 @@
     });
     // END 版块选择的检查，必须选择
 
-    // 选择招聘版块时，给出提示
-/*    $('#tab-value').on('change', function () {
+    // 选择版块时，change default活动类型
+    $('#tab-value').on('change', function () {
       var $this = $(this);
-      var value = $this.val();
-      var warnMsg = '';
-      if (value === 'job') {
-        warnMsg = '<strong>为避免被管理员删帖，发帖时请好好阅读<a href="http://cnodejs.org/topic/541ed2d05e28155f24676a12" target="_blank">《招聘帖规范》</a></strong>';
-      } else if (value === 'ask') {
-        warnMsg = '<strong>提问时，请遵循 <a href="http://doc.zengrong.net/smart-questions/cn.html" target="_blank">《提问的智慧》</a>中提及的要点，以便您更接收到高质量回复。</strong>'
+      var tab = $this.val();
+alert('tab:' + tab);
+
+      tabs.forEach(function (pair) {
+        var value = pair[0];
+        if (value === tab) {
+          $('#category').val(pair[2]);
+          break;
+        }
       }
-      $('#topic_create_warn').html(warnMsg);
-    });*/
+    });
     // END 选择招聘版块时，给出提示
   })();
 </script>

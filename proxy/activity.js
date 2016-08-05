@@ -30,41 +30,32 @@ exports.getFullActivity = function (id, callback) {
   var events = ['topic', 'author', 'replies', 'enrollments'];
   proxy
     .assign(events, function (topic, author, replies, enrollments) {
-console.log("getFullActivity0:" + Date.now());
       callback(null, '', topic, author, replies, enrollments);
-console.log("getFullActivity1:" + Date.now());
     })
     .fail(callback);
 
-console.log("getFullActivity2:" + Date.now());
   Activity.findOne({_id: id, deleted: false}, proxy.done(function (topic) {
     if (!topic) {
       proxy.unbind();
       return callback(null, '此activity不存在或已被删除。');
     }
-console.log("getFullActivity3:" + Date.now());
     proxy.emit('topic', topic);
     // at.linkUsers(topic.content, proxy.done('topic', function (str) {
     //   topic.linkedContent = str;  // TODO: not used
     //   return topic;
     // }));
 
-console.log("getFullActivity4:" + Date.now());
     User.getUserById(topic.author_id, proxy.done(function (author) {
       if (!author) {
         proxy.unbind();
         return callback(null, 'Activity的作者丢了。');
       }
-console.log("getFullActivity5:" + Date.now());
       proxy.emit('author', author);
     }));
 
-console.log("getFullActivity6:" + Date.now());
     Reply.getRepliesByTopicId(topic._id, proxy.done('replies'));
 
-console.log("getFullActivity7:" + Date.now());
     Enrollment.getEnrollmentsByActivityId(topic._id, proxy.done('enrollments'));
-console.log("getFullActivity8:" + Date.now());
   }));
 };
 

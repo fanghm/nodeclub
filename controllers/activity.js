@@ -23,15 +23,19 @@ var cache        = require('../common/cache');
 var logger = require('../common/logger');
 
 function validateRequest(req) {
-  // Store all form data to activity object first, get them from req.body
-  var act = new ActivityModel();
+  // because there're too many activity attributes, 
+  // get them from req.body in a loop 
+  var act = new ActivityModel();  // note: _id is a new one
   for (var prop in act) {
     if (req.body.hasOwnProperty(prop)) {
-      act[prop] = req.body[prop]; // TODO: trim string
+      //console.log("updated prop:" + prop);
+      if (typeof req.body[prop] === 'string') {
+        act[prop] = validator.trim(req.body[prop]);
+      } else {
+        act[prop] = req.body[prop];
+      }
     }
   }
-
-  console.log("req.body:" + JSON.stringify(act));
 
   act.content   = validator.trim(req.body.t_content);
   act.author_id = req.session.user._id;
@@ -93,69 +97,15 @@ exports.create = function (req, res, next) {
 };
 
 exports.put = function (req, res, next) {
-  // Store all form data to activity object first, get them from req.body
-  var act = new ActivityModel();
-  for (var prop in act) {
-    if (req.body.hasOwnProperty(prop)) {
-      act[prop] = req.body[prop]; // TODO: trim string
-    }
-  }
+  var data = validateRequest(req);
+  var act = data.act;
 
-  act.content   = validator.trim(req.body.t_content);
-  act.author_id = req.session.user._id;
-
-  if (act.need_pay) {
-    var fees = req.body.expense.split("/");
-    if (fees.length !== 6) {
-      editError = '费用格式wrong';
-    } else {
-      act.fee_man              = parseInt(fees[0]);
-      act.fee_woman            = parseInt(fees[1]);
-      act.fee_man_nonmember    = parseInt(fees[2]);
-      act.fee_woman_nonmember  = parseInt(fees[3]);
-      act.fee_man_extra        = parseInt(fees[4]);
-      act.fee_woman_extra      = parseInt(fees[5]);
-    }
-  }
-
-  console.log("New activity:" + JSON.stringify(act));
-
-  // 得到所有的 tab, e.g. ['ask', 'share', ..]
-  var allTabs = config.tabs.map(function (tPair) {
-    return tPair[0];
-  });
-
-  // 验证
-  var editError;
-  if (act.title === '') {
-    editError = '标题不能是空的。';
-  } else if (act.title.length < 5 || act.title.length > 100) {
-    editError = '标题字数太多或太少。';
-  } else if (!act.tab || allTabs.indexOf(act.tab) === -1) {
-    editError = '必须选择一个版块。';
-  } else if (act.content === '') {
-    editError = '内容不可为空';
-  } else if (act.address === '') {
-    editError = '活动地点不可为空';
-  } else if (act.contact === '') {
-    editError = '联系人及方法不可为空';
-  } else if (act.start_date === '' || act.end_date === '' || act.regret_date === '' || act.deadline === '' ) {
-    editError = '时间不可empty';
-  } else if (act.end_date < act.start_date) {
-    editError = '活动结束时间不可<开始时间';
-  }
-  // END 验证
-
-  if (editError) {
-  	var data 		= JSON.parse(JSON.stringify(act)); // obj copy
-  	data.edit_error	= editError;
-  	data.expense 	= req.body.expense;
-  	data.tabs 		= config.tabs;
-  	//console.log("Data sent to client:" + JSON.stringify(data));
+  if (data.hasOwnProperty('edit_error')) {
+    act.edit_error = data.edit_error;
 
     res.status(422);
-    return res.render('activity/edit', data);
-  }
+    return res.render('activity/edit', act);
+  }  
   
   act.save(function (err, activity) {
     if (err) {
@@ -196,10 +146,8 @@ exports.index = function (req, res, next) {
     return reply.ups.indexOf(user._id) !== -1;
   }
 
-console.log("0:" + Date.now());
   var activity_id = req.params.aid;
   var currentUser = req.session.user;
-console.log("index:" + activity_id);
 
   if (activity_id.length !== 24) {
     return res.render404('此活动不存在或已被删除。');
@@ -208,9 +156,6 @@ console.log("index:" + activity_id);
   var events = ['activity', 'is_collect'];
   var ep = EventProxy.create(events,
     function (activity, is_collect) { // /*other_activities, no_reply_activities,*/ 
-console.log("1:" + Date.now());
-
-console.log("1.1:" + JSON.stringify(activity));
     res.render('activity/index', {
       topic: activity,
       //author_other_topics: other_activities,
@@ -218,15 +163,11 @@ console.log("1.1:" + JSON.stringify(activity));
       is_uped: isUped,
       is_collect: is_collect,
     });
-console.log("2:" + Date.now());
   });
 
   ep.fail(next);
 
-console.log("3:" + Date.now());
   Activity.getFullActivity(activity_id, ep.done(function (message, activity, author, replies, enrollments) {
-
-console.log("4:" + Date.now());
     if (message) {
       logger.error('getFullActivity error activity_id: ' + activity_id)
       return res.renderError(message);
@@ -253,7 +194,6 @@ console.log("4:" + Date.now());
       return threshold;
     })();*/
 
-console.log("5:" + Date.now());
     ep.emit('activity', activity);
 
     /*/ get other_activitys
@@ -277,20 +217,17 @@ console.log("5:" + Date.now());
     }));*/
   }));
 
-console.log("6:" + Date.now());
   if (!currentUser) {
     ep.emit('is_collect', null);
   } else {
-console.log("7:" + Date.now());
-    TopicCollect.getTopicCollect(currentUser._id, activity_id, ep.done('is_collect'))
-console.log("8:" + Date.now());
+    TopicCollect.getTopicCollect(currentUser._id, activity_id, ep.done('is_collect'));
   }
 };
 
 exports.showEdit = function (req, res, next) {
-  var topic_id = req.params.aid;
+  var activity_id = req.params.aid;
 
-  Activity.getActivityById(topic_id, function (err, topic, tags) {
+  Activity.getActivityById(activity_id, function (err, topic, tags) {
     if (!topic) {
       res.render404('此活动不存在或已被删除。');
       return;
@@ -299,7 +236,7 @@ exports.showEdit = function (req, res, next) {
     if (String(topic.author_id) === String(req.session.user._id) || req.session.user.is_admin) {
       var data = JSON.parse(JSON.stringify(topic)); // obj copy
       data.action = 'edit';
-
+      data.activity_id = activity_id;
       res.render('activity/edit', data);
     } else {
       res.renderError('对不起，你不能编辑此活动。', 403);
@@ -309,9 +246,11 @@ exports.showEdit = function (req, res, next) {
 
 exports.update = function (req, res, next) {
   var data = validateRequest(req);
-  var act = data.act;
-  
-  Activity.getActivityById(req.params.aid, function (err, topic, tags) {
+  var act = JSON.parse(JSON.stringify(data.act));
+  delete act._id;
+  //console.log("data.act: " + JSON.stringify(act));
+
+  Activity.getActivityById(req.params.aid, function (err, topic, author) {
     if (!topic) {
       res.render404('此活动不存在或已被删除。');
       return;
@@ -321,17 +260,24 @@ exports.update = function (req, res, next) {
       if (data.hasOwnProperty('edit_error')) {
         act.action = 'edit';
         act.edit_error = data.edit_error;
+        act.activity_id = req.params.aid;
         return res.render('activity/edit', act);
       }
 
-      //保存活动
-      act.update_at = new Date();
-      act.save(function (err) {
+      //保存活动changes from req.body
+      for (var prop in act) {
+        topic[prop] = act[prop];
+      }
+
+      topic.update_at = new Date();
+      //console.log("Updated activity: " + JSON.stringify(topic));
+
+      topic.save(function (err) {
         if (err) {
           return next(err);
         }
 
-        res.redirect('/activity/' + act._id);
+        res.redirect('/activity/' + req.params.aid);
       });
     } else {
       res.renderError('对不起，你不能编辑此活动。', 403);
