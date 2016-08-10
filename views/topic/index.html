@@ -59,13 +59,10 @@
               tabValue = session.tab;
             }
 
-            tabs.forEach(function (pair) {
-              var value = pair[0];
-              var text = pair[1];
-              %>
-              <option value="<%=value%>" <%= tabValue === value ? 'selected': '' %>><%=text%></option>
-
-            <%});%>
+            for(var key in tabs) {
+            %>
+              <option value="<%=key%>" <%= tabValue === key ? 'selected': '' %>><%=tabs[key][0]%></option>
+            <%}%>
           </select>
 
           <div class="pull-right">

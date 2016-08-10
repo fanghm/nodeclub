@@ -174,12 +174,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Nokia ID</th>
-            <th>Name</th>
-            <th>Enrollment Option</th>
+            <th>Email</th>
             <th>Contact</th>
-            <th>Enrollment Time</th>
-            <th>Operations</th>
+            <th>Option</th>
+            <th>Time</th>
+            <th>Balance</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -201,33 +201,34 @@
       <form role="form" id='reply_form' action='/<%= topic._id %>/enroll' method='post'>
 
         <div class="form-group">
-          <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
+          <label for="email" class="control-label col-sm-2">填写email*</label>
           <div class="col-sm-5">
-            <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '1000' %>" />
-          </div>
-          <!--label for="enroll_info" class="control-label">已报名名单</label-->
-        </div>
-
-        <div class="form-group">
-          <label for="option" class="control-label col-sm-2">填写报名名单*</label>
-          <div class="col-sm-5">
-            <input type="text" id="option" name="option" value="<%= typeof(option) !== 'undefined' && option || 'frank' %>" />
+            <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || 'frank@test.com' %>" />
           </div>
         </div>
 
         <div class="form-group">
           <label for="contact" class="control-label col-sm-2">填写联系方式*</label>
           <div class="col-sm-5">
-            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || 'frank' %>" />
+            <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || '16637216636' %>" />
           </div>
         </div>
 
         <div class="form-group">
-          <label for="email" class="control-label col-sm-2">填写email*</label>
+          <label for="option" class="control-label col-sm-2">填写报名名单*</label>
           <div class="col-sm-5">
-            <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || 'frank@test.com' %>" />
+            <input type="text" id="option" name="option" value="<%= typeof(option) !== 'undefined' && option || '1 adult + 2 children' %>" />
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
+          <div class="col-sm-5">
+            <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '9999' %>" readonly/>
+          </div>
+        </div>
+
+        <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
         <div class="form-group">
           <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="Enroll" >

@@ -1,10 +1,11 @@
 <tr reply_item reply_id="<%= enrollment._id %>" >
   <td><%= indexInCollection + 1 %></td>
-  <td><%= enrollment.author.loginname %></td>
-  <td><%= enrollment.balance %></td>
-  <td><%= enrollment.option %></td>
+  <td><%= enrollment.email %></td>
+  <!--td><%= enrollment.author.loginname %></td-->
   <td><%= enrollment.contact %></td>
+  <td><%= enrollment.option %></td>
   <td><%= enrollment.create_at %></td>
+  <td><%= enrollment.balance %></td>
   <td>
     <% if (current_user && current_user.is_admin ||
     (current_user && current_user._id.toString() == enrollment.author._id.toString())

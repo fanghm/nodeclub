@@ -40,8 +40,7 @@ var requestLog = require('./middlewares/request_log');
 var renderMiddleware = require('./middlewares/render');
 var logger = require('./common/logger');
 var helmet = require('helmet');
-var bytes = require('bytes')
-
+var bytes = require('bytes');
 
 // 静态文件目录
 var staticDir = path.join(__dirname, 'public');
@@ -147,6 +146,9 @@ _.extend(app.locals, {
   Loader: Loader,
   assets: assets
 });
+
+
+
 
 app.use(errorPageMiddleware.errorPage);
 _.extend(app.locals, require('./common/render_helper'));

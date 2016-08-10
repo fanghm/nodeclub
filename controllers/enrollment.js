@@ -14,6 +14,7 @@ var config     = require('../config');
  * 添加回复
  */
 exports.add = function (req, res, next) {
+  var email  = req.body.email;
   var option  = req.body.option;
   var contact = req.body.contact;
   var balance = req.body.balance;
@@ -23,6 +24,11 @@ exports.add = function (req, res, next) {
   var str = validator.trim(String(option));
   if (str === '') {
     return res.renderError('回复option内容不能为空!', 422);
+  }
+
+  str = validator.trim(String(email));
+  if (str === '') {
+    return res.renderError('回复email内容不能为空!', 422);
   }
 
   str = validator.trim(String(contact));
@@ -57,7 +63,7 @@ exports.add = function (req, res, next) {
 
   ep.all('topic', 'topic_author', function (topic, topicAuthor) { //name????
     console.log("3.0");
-    Enrollment.newAndSave(option, contact, balance, 0, topic_id, req.session.user._id, ep.done(function (reply) {
+    Enrollment.newAndSave(email, contact, option, balance, 0, topic_id, req.session.user._id, ep.done(function (reply) {
       //Activity.updateLastReply(topic_id, reply._id, ep.done(function () {
         ep.emit('reply_saved', reply);
         console.log("3.3");

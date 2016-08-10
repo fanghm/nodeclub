@@ -1,4 +1,8 @@
 <%- partial('../editor_sidebar') %>
+<script>
+  // put it here so that it can be used in client js
+  var client_tabs = <%- JSON.stringify(tabs) %>;
+</script>
 
 <div id='content'>
   <div class='panel'>
@@ -8,7 +12,7 @@
         <% if(typeof(action) !== 'undefined' && action == 'edit'){ %>
           <li class='active'>编辑活动</li>
         <% }else{ %>
-          <li class='active'>发布活动</li>
+          <li class='active'><a href='/activity/create'>发布活动</a></li>
         <% } %>
       </ol>
     </div>
@@ -34,7 +38,7 @@
 
           <fieldset>
             <div class="control-group">
-              <label for="tab-value" class="control-label tab-selector">版块：</label>
+              <label id="tab-label" for="tab-value" class="control-label">版块：</label>
 
               <!--span class="tab-selector">选择版块：</span-->
               <select name="tab" id="tab-value" autofocus>
@@ -43,17 +47,15 @@
                 var tabValue = '';
                 if (typeof(tab) !== 'undefined') {
                   tabValue = tab;
-                } else if (session.tab && session.tab !== 'undefined'){
+                } else if (session.tab && session.tab !== 'undefined') {
                   tabValue = session.tab;
                 }
 
                 var activity; // default activity of the board
-                tabs.forEach(function (pair) {
-                  var value = pair[0];
-                  var text = pair[1];
+                for(var key in tabs) {
                 %>
-                <option value="<%=value%>" <%= tabValue === value ? (activity=pair[2], 'selected'): '' %>><%=text%></option>
-                <%});%>
+                  <option value="<%=key%>" <%= ((tabValue === key) ? (activity=tabs[key][1], 'selected') : '') %> ><%=tabs[key][0]%></option>
+                <%}%>
               </select>
             </div>
 
@@ -68,15 +70,15 @@
             <select id='category' name='category'>
               <option value="">请选择</option>
               <%
-                if (typeof category !== 'undefined') { // edit mode 
+                if (typeof category !== 'undefined') { // edit mode, use user input instead of default activity of current board
                   activity = category;
                 }
 
-                tabs.forEach(function (pair) {
-                  var text = pair[2];
+                for(var key in tabs) {
+                  var text = tabs[key][1];
                 %>
-                <option value="<%=text%>" <%= (activity === text) ? 'selected': '' %>><%=text%></option>
-                <%});%>
+                  <option value="<%=text%>" <%= (activity === text) ? 'selected': '' %>><%=text%></option>
+                <%}%>
             </select>
           </div>
 
@@ -172,7 +174,7 @@
   (function () {
     $('#start_date').datetimepicker({step:30, minDate:0, });
     $('#end_date').datetimepicker({
-      step:30, 
+      step:30,
       onShow:function( ct ){
         this.setOptions({
           minDate:jQuery('#start_date').val()?jQuery('#start_date').val():false
@@ -183,15 +185,14 @@
     $('#deadline').datetimepicker({step:30, minDate:0, });
 
     $("input[name$='need_pay']").click(function() {
-        if ($(this).val() == '1') {
-          document.getElementById('4expense').style.display = "block"; //inline-block
-        }
-        else {
-          document.getElementById('4expense').style.display = "none";
-        }
+      if ($(this).val() == '1') {
+        document.getElementById('4expense').style.display = "block"; //inline-block
+      } else {
+        document.getElementById('4expense').style.display = "none";
+      }
     });
 
-    // -------------------------------------
+    // init markdown editor
     var editor = new Editor();
     editor.render($('.editor')[1]);
 
@@ -201,7 +202,7 @@
       if (!tabValue) {
         alert('必须选择一个版块！');
         $('.submit_btn').button('reset');
-        $('.tab-selector').css('color', 'red');
+        $('#tab-label').css('color', 'red');
         return false;
       }
     });
@@ -211,15 +212,11 @@
     $('#tab-value').on('change', function () {
       var $this = $(this);
       var tab = $this.val();
-alert('tab:' + tab);
 
-      tabs.forEach(function (pair) {
-        var value = pair[0];
-        if (value === tab) {
-          $('#category').val(pair[2]);
-          break;
-        }
-      }
+      //alert('tab: ' + tab + '\nclient_tabs: ' + JSON.stringify(client_tabs) + "\ncatetory: " + client_tabs[tab][1]);
+
+      $('#category').val(client_tabs[tab][1]);
+
     });
     // END 选择招聘版块时，给出提示
   })();

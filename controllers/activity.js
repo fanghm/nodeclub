@@ -54,18 +54,13 @@ function validateRequest(req) {
     }
   }
 
-  // 得到所有的 tab, e.g. ['ask', 'share', ..]
-  var allTabs = config.tabs.map(function (tPair) {
-    return tPair[0];
-  });
-
   // 验证
   var editError;
   if (act.title === '') {
     editError = '标题不能是空的。';
   } else if (act.title.length < 5 || act.title.length > 100) {
     editError = '标题字数太多或太少。';
-  } else if (!act.tab || allTabs.indexOf(act.tab) === -1) {
+  } else if (!act.tab || Object.keys(config.tabs).indexOf(act.tab) === -1) {
     editError = '必须选择一个版块。';
   } else if (act.content === '') {
     editError = '活动内容不可为空';
@@ -102,7 +97,7 @@ exports.put = function (req, res, next) {
 
   if (data.hasOwnProperty('edit_error')) {
     act.edit_error = data.edit_error;
-
+    //act.tabs = config.tabs;
     res.status(422);
     return res.render('activity/edit', act);
   }  
@@ -237,6 +232,7 @@ exports.showEdit = function (req, res, next) {
       var data = JSON.parse(JSON.stringify(topic)); // obj copy
       data.action = 'edit';
       data.activity_id = activity_id;
+      //data.tabs = config.tabs;
       res.render('activity/edit', data);
     } else {
       res.renderError('对不起，你不能编辑此活动。', 403);

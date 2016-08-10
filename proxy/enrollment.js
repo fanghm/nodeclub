@@ -94,9 +94,10 @@ exports.getEnrollmentById = function (id, callback) {
  * @param {String} [replyId] 回复ID，当二级回复时设定该值
  * @param {Function} callback 回调函数
  */
-exports.newAndSave = function (option, contact, balance, fee, topicId, authorId, callback) {
+exports.newAndSave = function (email, contact, option, balance, fee, topicId, authorId, callback) {
 
   var reply     = new Enrollment();
+  reply.email   = email;
   reply.option  = option;
   reply.contact = contact;
   reply.balance = balance;
