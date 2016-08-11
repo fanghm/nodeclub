@@ -101,7 +101,6 @@ router.get('/activity/list', auth.userRequired, activity.list);	// 活动list
 
 // reply controller
 router.post('/:topic_id/reply', auth.userRequired, limit.peruserperday('create_reply', config.create_reply_per_day, false), reply.add); // 提交一级回复
-router.post('/:topic_id/replyActivity', auth.userRequired, limit.peruserperday('create_reply', config.create_reply_per_day, false), reply.addActivity);
 router.get('/reply/:reply_id/edit', auth.userRequired, reply.showEdit); // 修改自己的评论页
 router.post('/reply/:reply_id/edit', auth.userRequired, reply.update); // 修改某评论
 router.post('/reply/:reply_id/delete', auth.userRequired, reply.delete); // 删除某评论

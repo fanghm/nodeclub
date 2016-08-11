@@ -24,7 +24,11 @@
       <% if (current_user && current_user.is_admin ||
       (current_user && current_user._id.toString() == reply.author._id.toString())
       ) { %>
+        <% if (topic.is_activity) { %>
+      <a href='/reply/<%= reply._id %>/edit?is_activity=1' class='edit_reply_btn'>
+        <% } else { %>
       <a href='/reply/<%= reply._id %>/edit' class='edit_reply_btn'>
+        <% } %>
         <i class="fa fa-pencil-square-o" title='编辑'></i>
       </a>
       <a href='javascript:void(0);' class='delete_reply_btn'>

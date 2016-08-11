@@ -9,7 +9,7 @@ var Reply      = require('../proxy').Reply;
 var config     = require('../config');
 
 /**
- * 添加回复
+ * 添加回复 to topic & activity
  */
 exports.add = function (req, res, next) {
   var content = req.body.r_content;
@@ -68,71 +68,12 @@ exports.add = function (req, res, next) {
   });
 
   ep.all('reply_saved', 'message_saved', 'score_saved', function (reply) {
-    res.redirect('/topic/' + topic_id + '#' + reply._id);
-  });
-};
-
-/**
- * 添加回复Activity
- */
-exports.addActivity = function (req, res, next) {
-  var content = req.body.r_content;
-  var topic_id = req.params.topic_id;
-  var reply_id = req.body.reply_id;
-
-  var str = validator.trim(String(content));
-  if (str === '') {
-    return res.renderError('回复内容不能为空!', 422);
-  }
-
-  var ep = EventProxy.create();
-  ep.fail(next);
-
-  Topic.getTopic(topic_id, ep.doneLater(function (topic) {
-    if (!topic) {
-      ep.unbind();
-      // just 404 page
-      return next();
+    // if topic is an activity, redirect otherwise
+    if (req.body.hasOwnProperty('is_activity')) {
+      res.redirect('/activity/' + topic_id + '#' + reply._id);
+    } else {
+      res.redirect('/topic/' + topic_id + '#' + reply._id);
     }
-
-    if (topic.lock) {
-      return res.status(403).send('此主题已锁定。');
-    }
-    ep.emit('topic', topic);
-  }));
-
-  ep.all('topic', function (topic) {
-    User.getUserById(topic.author_id, ep.done('topic_author'));
-  });
-
-  ep.all('topic', 'topic_author', function (topic, topicAuthor) {
-    Reply.newAndSave(content, topic_id, req.session.user._id, reply_id, ep.done(function (reply) {
-      Topic.updateLastReply(topic_id, reply._id, ep.done(function () {
-        ep.emit('reply_saved', reply);
-        //发送at消息，并防止重复 at 作者
-        //var newContent = content.replace('@' + topicAuthor.loginname + ' ', '');
-        //at.sendMessageToMentionUsers(newContent, topic_id, req.session.user._id, reply._id);
-      }));
-    }));
-
-    User.getUserById(req.session.user._id, ep.done(function (user) {
-      user.score += 5;
-      user.reply_count += 1;
-      user.save();
-      req.session.user = user;
-      ep.emit('score_saved');
-    }));
-  });
-/*
-  ep.all('reply_saved', 'topic', function (reply, topic) {
-    if (topic.author_id.toString() !== req.session.user._id.toString()) {
-      message.sendReplyMessage(topic.author_id, req.session.user._id, topic._id, reply._id);
-    }
-    ep.emit('message_saved');
-  });*/
-
-  ep.all('reply_saved', 'score_saved', function (reply) {
-    res.redirect('/activity/' + topic_id + '#' + reply._id);
   });
 };
 
@@ -178,10 +119,16 @@ exports.showEdit = function (req, res, next) {
       return res.render404('此回复不存在或已被删除。');
     }
     if (req.session.user._id.equals(reply.author_id) || req.session.user.is_admin) {
-      res.render('reply/edit', {
+      var locals = {
         reply_id: reply._id,
         content: reply.content
-      });
+      };
+
+      if (req.query.hasOwnProperty('is_activity')) {
+        locals['is_activity'] = req.query.is_activity;
+      }
+
+      res.render('reply/edit', locals);
     } else {
       return res.renderError('对不起，你不能编辑此回复。', 403);
     }
@@ -207,7 +154,12 @@ exports.update = function (req, res, next) {
           if (err) {
             return next(err);
           }
-          res.redirect('/topic/' + reply.topic_id + '#' + reply._id);
+          // if topic is an activity, redirect otherwise
+          if (req.body.hasOwnProperty('is_activity')) {
+            res.redirect('/activity/' + reply.topic_id + '#' + reply._id);
+          } else {
+            res.redirect('/topic/' + reply.topic_id + '#' + reply._id);
+          }
         });
       } else {
         return res.renderError('回复的字数太少。', 400);

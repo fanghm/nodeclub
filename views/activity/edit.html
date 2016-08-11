@@ -109,9 +109,9 @@
 
           <div class="control-group">
             <label for="need_pay" class="control-label">是否俱乐部收费活动*</label>
-            <label class="radio inline"><input type="radio" name="need_pay" value="1" 
-              <%= (typeof(need_pay) !== 'undefined' && need_pay == true) ? 'checked' : '' %> >&nbsp;Yes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-            <label class="radio inline"><input type="radio" name="need_pay" value="0"
+            <label class="radio inline radio-padding-right"><input type="radio" name="need_pay" value="1"
+              <%= (typeof(need_pay) !== 'undefined' && need_pay == true) ? 'checked' : '' %> >&nbsp;Yes</label>
+            <label class="radio inline radio-padding-right"><input type="radio" name="need_pay" value="0"
               <%= (typeof(need_pay) === 'undefined' || need_pay !== true) ? 'checked' : '' %> >&nbsp;No</label>
           </div>  
 
@@ -149,6 +149,14 @@
                     ><%= typeof(content) !== 'undefined' && content || 'welcome to test...' %></textarea>
               </div>
             </div>
+          </div>
+
+          <div class="control-group">
+            <label for="option" class="control-label">Other options*</label>
+            <textarea rows="3" id="option" name="option"  style="width: 890px;">
+              <%= typeof(option) !== 'undefined' && option ||
+              '[ {id: \"citizen_id\", type: \"text\"}, {id: \"age\", type: \"number\", value: 10} ]' %>
+            </textarea>
           </div>
 
           <div class="control-group">

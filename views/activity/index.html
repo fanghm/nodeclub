@@ -190,38 +190,38 @@
   </div>
   <% } %>
 
-  <!--报名详细信息-->
+  <!--TODO: use ajax for 报名-->
   <% if (current_user && typeof(topic) !== 'undefined') { %>
   <div class='panel'>
     <div class='header'>
       <span class='col_fade'>添加enrollment</span>
     </div>
 
-    <div class='inner reply'>
-      <form role="form" id='reply_form' action='/<%= topic._id %>/enroll' method='post'>
+    <div class='inner2 reply'>
+      <form class="form-horizontal" role="form" id='reply_form' action='/<%= topic._id %>/enroll' method='post'>
 
-        <div class="form-group">
+        <div class="control-group">
           <label for="email" class="control-label col-sm-2">填写email*</label>
           <div class="col-sm-5">
             <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || 'frank@test.com' %>" />
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="control-group">
           <label for="contact" class="control-label col-sm-2">填写联系方式*</label>
           <div class="col-sm-5">
             <input type="text" id="contact" name="contact" value="<%= typeof(contact) !== 'undefined' && contact || '16637216636' %>" />
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="control-group">
           <label for="option" class="control-label col-sm-2">填写报名名单*</label>
           <div class="col-sm-5">
             <input type="text" id="option" name="option" value="<%= typeof(option) !== 'undefined' && option || '1 adult + 2 children' %>" />
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="control-group">
           <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
           <div class="col-sm-5">
             <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '9999' %>" readonly/>
@@ -230,9 +230,12 @@
 
         <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
-        <div class="form-group">
+        <div class="control-group">
+        <div class="controls">
           <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="Enroll" >
+          <input class='span-primary submit_btn' type="reset" value="Reset" >
           <input type='hidden' name='_csrf' id="_csrf" value='<%= csrf %>'/>
+        </div>
         </div>
 
       </form>
@@ -255,7 +258,9 @@
       <span class='col_fade'>添加回复</span>
     </div>
     <div class='inner reply'>
-      <form id='reply_form' action='/<%= topic._id %>/replyActivity' method='post'>
+      <form id='reply_form' action='/<%= topic._id %>/reply' method='post'>
+        <!--add a hiddern field for handling reply with same router -->
+        <input type='hidden' name='is_activity' value='1' />
 
         <div class='markdown_editor in_editor'>
           <div class='markdown_in_editor'>
@@ -348,7 +353,9 @@ loading-text="回复中.." value="回复" >
     $('#content').on('click', '.reply2_btn', function (event) {
       var $btn = $(event.currentTarget);
       var parent = $btn.closest('.reply_area');
-      var editorWrap = parent.find('.reply2_form');
+      var editorWrap = parent.find('.reply2_form')
+        .prepend("<input type='hidden' name='is_activity' value='1' />");
+
       parent.find('.reply2_area').prepend(editorWrap);
       var textarea = editorWrap.find('textarea.editor');
       var user = $btn.closest('.author_content').find('.reply_author').text().trim();

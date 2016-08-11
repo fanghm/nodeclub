@@ -22,6 +22,10 @@
       <% }else{ %>
       <form id='edit_reply_form' action='/reply/<%= reply_id %>/edit' method='post'>
         <fieldset>
+          <% if (typeof is_activity !== 'undefined') { %>
+            <input type='hidden' name='is_activity' value='<%= is_activity %>' />
+          <% } %>
+
           <div class='markdown_editor in_editor'>
             <div class='markdown_in_editor'>
               <textarea class='editor' name='t_content' rows='20'
