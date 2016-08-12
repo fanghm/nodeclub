@@ -14,7 +14,6 @@ var at         = require('../common/at');
  * @param {Function} callback 回调函数
  */
 exports.getEnrollmentsByActivityId = function (id, cb) {
-console.log("getEnrollmentsByActivityId0:" + Date.now());
   Enrollment.find({activity_id: id, deleted: false}, '', {sort: 'create_at'}, function (err, enrollments) {
     if (err) {
       return cb(err);
@@ -87,26 +86,11 @@ exports.getEnrollmentById = function (id, callback) {
 };
 
 /**
- * 创建并保存一条回复信息
- * @param {String} content 回复内容
- * @param {String} topicId 主题ID
- * @param {String} authorId 回复作者
- * @param {String} [replyId] 回复ID，当二级回复时设定该值
+ * 创建并保存一条enrollment
+ * @param {models.Enrollment} [enrollment] enrollment
  * @param {Function} callback 回调函数
  */
-exports.newAndSave = function (email, contact, option, balance, fee, topicId, authorId, callback) {
-
-  var reply     = new Enrollment();
-  reply.email   = email;
-  reply.option  = option;
-  reply.contact = contact;
-  reply.balance = balance;
-  reply.fee     = fee;
-  
-  reply.activity_id  = topicId;
-  reply.author_id = authorId;
-
-
+exports.newAndSave = function (reply, callback) {
   reply.save(function (err) {
     callback(err, reply);
   });

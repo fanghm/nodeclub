@@ -19,7 +19,6 @@ exports.add = function (req, res, next) {
   var contact = req.body.contact;
   var balance = req.body.balance;
   var topic_id = req.params.aid;
-  console.log("option: " + option + ", topic_id: " + topic_id);
 
   var str = validator.trim(String(option));
   if (str === '') {
@@ -39,9 +38,7 @@ exports.add = function (req, res, next) {
   var ep = EventProxy.create();
   ep.fail(next);
 
-  console.log("0");
   Activity.getActivity(topic_id, ep.done(function (topic) { // doneLater
-    console.log("1.0");
     if (!topic) {
       ep.unbind();
       // just 404 page
@@ -52,33 +49,46 @@ exports.add = function (req, res, next) {
       //return res.renderError('此activity已 pass deadline, 锁定!', 422); // TODO: enable this line after testing
     }
     ep.emit('topic', topic);
-    console.log("1.9");
   }));
 
   ep.all('topic', function (topic) {
-    console.log("2.0");
     User.getUserById(topic.author_id, ep.done('topic_author'));
-    console.log("2.9");
   });
 
-  ep.all('topic', 'topic_author', function (topic, topicAuthor) { //name????
-    console.log("3.0");
-    Enrollment.newAndSave(email, contact, option, balance, 0, topic_id, req.session.user._id, ep.done(function (reply) {
+  ep.all('topic', 'topic_author', function (topic, topicAuthor) {
+    var enrollment = new require('../models').Enrollment();
+    var options = {};
+
+    console.log("req.body: " + JSON.stringify(req.body) );
+
+    for(var prop in req.body) {
+      if (enrollment.hasOwnProperty(prop)) {
+        enrollment[prop] = req.body[prop];
+      } else if (prop.substr(0, 7) === "option_" && req.body[prop].trim() !== "") {
+        options[prop] = req.body[prop].trim();
+      }
+    }
+
+    console.log("Custom options: " + JSON.stringify(options));
+
+    enrollment.options = options;
+    enrollment.activity_id  = topic_id;
+    enrollment.author_id = req.session.user._id;
+    console.log("New enrollment: " + JSON.stringify(enrollment));
+
+    Enrollment.newAndSave(enrollment, ep.done(function (reply) {
       //Activity.updateLastReply(topic_id, reply._id, ep.done(function () {
         ep.emit('reply_saved', reply);
-        console.log("3.3");
       //}));
     }));
-    console.log("3.5");
+
     User.getUserById(req.session.user._id, ep.done(function (user) {
       user.score += 5;
       user.enroll_count += 1;
       user.save();
       req.session.user = user;
       ep.emit('score_saved');
-      console.log("3.6");
     }));
-    console.log("3.9");
   });
 
   // ep.all('reply_saved', 'topic', function (reply, topic) {
@@ -87,13 +97,10 @@ exports.add = function (req, res, next) {
   //   }
   //   ep.emit('message_saved');
   // });
-  console.log("4.0");
+
   ep.all('reply_saved', 'score_saved', function (reply) {
-    console.log("reply._id: " + reply._id);
-    console.log("5!");
     res.redirect('/activity/' + topic_id + '#' + reply._id);
   });
-  console.log("4.9");
 };
 
 /**

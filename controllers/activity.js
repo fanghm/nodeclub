@@ -81,7 +81,7 @@ function validateRequest(req) {
     data.edit_error = editError;
   }
   
-  console.log("validateRequest:" + JSON.stringify(data));
+  //console.log("validateRequest:" + JSON.stringify(data));
   return data;
 }
 
@@ -188,6 +188,23 @@ exports.index = function (req, res, next) {
       }
       return threshold;
     })();*/
+
+/*  
+    // for debugging  
+    var options = activity.options.trim();
+    console.log("activity.options:" + options);
+    if (options !== "") {
+      try {
+        var obj = JSON.parse(options);
+        obj.forEach( function(option) {
+          console.log(JSON.stringify(option));
+        });
+
+      } catch (ex) {
+        console.error("Exception in parsing options:" + ex.message
+          + "\nQuotation marks around field/values cannot be omitted.");
+      }
+    }*/
 
     ep.emit('activity', activity);
 

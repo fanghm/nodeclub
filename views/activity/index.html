@@ -203,7 +203,7 @@
         <div class="control-group">
           <label for="email" class="control-label col-sm-2">填写email*</label>
           <div class="col-sm-5">
-            <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || 'frank@test.com' %>" />
+            <input type="email" id="email" name="email" value="<%= typeof(email) !== 'undefined' && email || current_user.email %>" />
           </div>
         </div>
 
@@ -228,6 +228,72 @@
           </div>
         </div>
 
+        <!--handle custom options-->
+        <% if (topic.options !== "") {
+          try {
+            var obj = JSON.parse(topic.options);
+            obj.forEach( function(option) {
+              //console.log(JSON.stringify(option));
+              if (!option.hasOwnProperty('type')) {
+                throw new Error("Each option must have a type attribue (text, number or select).");
+              }
+              if (!option.hasOwnProperty('id')) {
+                throw new Error("Each option must have a unique id attribue.");
+              }
+              if (!option.hasOwnProperty('name')) {
+                option.name = "option_" + option.id;  // field suffix must be consistent with enrollment.add()
+              }
+              if (!option.hasOwnProperty('label')) {
+                option.label = option.id.replace('_', ' '); // capitalize
+              }
+
+              switch (option.type) {
+                case "text":
+                case "number":
+              %>
+                  <div class="control-group">
+                    <label for="<%= option.id %>" class="control-label col-sm-2"><%= option.label %></label>
+                    <div class="col-sm-5">
+                      <input type="<%= option.type %>" id="<%= option.id %>" name="<%= option.name %>" />
+                    </div>
+                  </div>
+              <%
+                  break;
+
+                case "select":
+                  // TODO: validate options
+                  // if (!option.hasOwnProperty('value')) {
+                  //   throw new Error("Each option must have a value attribue.");
+                  // }
+              %>
+                  <div class="control-group">
+                    <label for="<%= option.id %>" class="control-label col-sm-2"><%= option.label %></label>
+                    <div class="col-sm-5">
+                      <select id="<%= option.id %>" name="<%= option.name %>">
+                        <option value="">请选择</option>
+                        <% option.options.forEach( function(opt) {
+                          var option_attrs = "";
+                          for (var prop in opt) {
+                            option_attrs += prop + "=\'" + opt[prop] + "\' ";
+                          };
+                        %>
+                        <option <%= option_attrs %> ><%= opt.value %></option>
+                        <%});%>
+                      </select>
+                    </div>
+                  </div>
+              <%
+                  break;
+
+                default:
+                  break;
+              }
+            });
+          } catch (ex) {
+            // TODO: display error
+            console.error("Exception in parsing options:", ex.message);
+          }
+        } %>
         <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
         <div class="control-group">
