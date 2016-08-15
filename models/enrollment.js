@@ -7,13 +7,16 @@ var EnrollmentSchema = new Schema({
   activity_id: { type: ObjectId},
   author_id: { type: ObjectId },
 
+  // fixed options
   email: { type: String},
   mobile: { type: String},
   contact: { type: String },  // 联系人及方法
-  attendance: { type: Number, default: 1 },  // 报名人数
+
   options: { type: Schema.Types.Mixed}, // for custom option fields
   
+  attendance: { type: Number, default: 1 },  // 报名人数
   price: { type: Number, default: 0 },	// for freezing
+
   balance: { type: Number },	// current available balance before freezing
 
   create_at: { type: Date, default: Date.now },

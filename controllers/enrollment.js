@@ -69,6 +69,10 @@ exports.add = function (req, res, next) {
       }
     }
 
+    if (req.body.hasOwnProperty('public_fields')) {
+      options['public_fields'] = req.body[public_fields].trim();
+    }
+
     console.log("Custom options: " + JSON.stringify(options));
 
     enrollment.options = options;

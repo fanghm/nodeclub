@@ -179,6 +179,9 @@
             <th>Option</th>
             <th>Time</th>
             <th>Balance</th>
+            <% if (topic.options !== "" && ) {
+            }
+            %>
             <th></th>
           </tr>
         </thead>
@@ -214,22 +217,11 @@
           </div>
         </div>
 
-        <div class="control-group">
-          <label for="option" class="control-label col-sm-2">填写报名名单*</label>
-          <div class="col-sm-5">
-            <input type="text" id="option" name="option" value="<%= typeof(option) !== 'undefined' && option || '1 adult + 2 children' %>" />
-          </div>
-        </div>
-
-        <div class="control-group">
-          <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
-          <div class="col-sm-5">
-            <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '9999' %>" readonly/>
-          </div>
-        </div>
-
         <!--handle custom options-->
-        <% if (topic.options !== "") {
+        <%var hasPrice = false, hasAttendance = false;
+          var public_fields = [];  // fields visible to public, some only visible to admin for privacy reason
+
+          if (topic.options !== "") {
           try {
             var obj = JSON.parse(topic.options);
             obj.forEach( function(option) {
@@ -239,12 +231,24 @@
               }
               if (!option.hasOwnProperty('id')) {
                 throw new Error("Each option must have a unique id attribue.");
+              } else {
+                //option.id = "id_" + option.id;
               }
               if (!option.hasOwnProperty('name')) {
-                option.name = "option_" + option.id;  // field suffix must be consistent with enrollment.add()
+                // for both form and storage in db
+                // Add a suffix to avoid duplication with existent field id
+                // Note: this suffix must be consistent with that in add() method of enrollment controller
+                option.name = "option_" + option.id;
               }
               if (!option.hasOwnProperty('label')) {
-                option.label = option.id.replace('_', ' '); // capitalize
+                option.label = _.capitalize(option.id.replace(/[-_\s]+/g, ' ')); // TODO: capitalize each word
+              }
+              if (!option.hasOwnProperty('desc')) {
+                option.desc = "";
+              }
+
+              if (option.hasOwnProperty('public')) {
+                public_fields.push(option.id);
               }
 
               switch (option.type) {
@@ -255,6 +259,7 @@
                     <label for="<%= option.id %>" class="control-label col-sm-2"><%= option.label %></label>
                     <div class="col-sm-5">
                       <input type="<%= option.type %>" id="<%= option.id %>" name="<%= option.name %>" />
+                      <span>("<%= option.desc %>")</span>
                     </div>
                   </div>
               <%
@@ -271,14 +276,21 @@
                     <div class="col-sm-5">
                       <select id="<%= option.id %>" name="<%= option.name %>">
                         <option value="">请选择</option>
-                        <% option.options.forEach( function(opt) {
-                          var option_attrs = "";
-                          for (var prop in opt) {
-                            option_attrs += prop + "=\'" + opt[prop] + "\' ";
-                          };
+                        <% var option_attrs = "";
+                          option.options.forEach( function(opt) {
+                            for (var prop in opt) {
+                              if (prop  !== 'value') {
+                                if (prop  === 'price') hasPrice = true;
+                                if (prop  === 'attendance') hasAttendance = true;
+                                option_attrs += " " + prop + "=" + opt[prop];
+                              }
+                            };
                         %>
-                        <option <%= option_attrs %> ><%= opt.value %></option>
-                        <%});%>
+                            <option <%= option_attrs %> ><%= opt.value %></option>
+                        <%
+                            option_attrs = ""; // reset for next option
+                          });
+                        %>
                       </select>
                     </div>
                   </div>
@@ -296,9 +308,44 @@
         } %>
         <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
+        <!--optional fields, only display when mentioned in custom fields</label-->
+        <% if (hasAttendance) { %>
+        <div class="control-group">
+          <label for="attendance" class="control-label col-sm-2">Attendance</label>
+          <div class="col-sm-5">
+            <input type="number" id="attendance" name="attendance" value="<%= typeof(attendance) !== 'undefined' && attendance || 1 %>" readonly/>
+          </div>
+        </div>
+        <%
+        }
+
+        if (hasPrice) { 
+        %>
+        <div class="control-group">
+          <label for="price" class="control-label col-sm-2">Price</label>
+          <div class="col-sm-5">
+            <input type="number" id="price" name="price" value="<%= typeof(price) !== 'undefined' && price || '99' %>" readonly/>
+          </div>
+        </div>
+        <%
+        } 
+
+        if (public_fields.length > 0) { // add a hidden field 
+          <input type="hidden" name="public_fields" value="<%= public_fields.join('|') %>" />
+        }
+        %>
+
+        <div class="control-group">
+          <label for="balance" class="control-label col-sm-2">本人帐户余额</label>
+          <div class="col-sm-5">
+            <input type="text" id="balance" name="balance" value="<%= typeof(balance) !== 'undefined' && balance || '500' %>" readonly/>
+            <span id='balance_hint' style='color: red;'> </span>
+          </div>
+        </div>
+
         <div class="control-group">
         <div class="controls">
-          <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="Enroll" >
+          <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." id='enroll-btn' value="Enroll" >
           <input class='span-primary submit_btn' type="reset" value="Reset" >
           <input type='hidden' name='_csrf' id="_csrf" value='<%= csrf %>'/>
         </div>
@@ -711,6 +758,31 @@ loading-text="回复中.." value="回复" >
     function hideModal() {
       $previewModal.modal('hide');
     }
+
+    // for custom price and attendance input elements
+    $('select').on('change', function () {
+      var option = $('option:selected', this);
+
+      $('#attendance').val((typeof(option.attr('attendance')) !== 'undefined') ? option.attr('attendance') : 1);
+
+      if (typeof(option.attr('price')) !== 'undefined') {
+        var attr = option.attr('price');
+        $('#price').val(attr);
+
+        var price = parseFloat(attr);
+        var money = parseFloat($('#balance').val());
+        //alert('price: ' + price + '\nbalance: ' + money);
+        if (NaN !== price && money !== NaN && price > money) {
+          $('#balance_hint').text('Insufficient balance!');
+          $('#enroll-btn').prop("disabled", true);
+        } else {
+          $('#balance_hint').text('');
+          $('#enroll-btn').prop("disabled", false);
+        }
+      } else {
+        $('#price').val(0);
+      }
+    });
 
   })()
   // END 图片预览
