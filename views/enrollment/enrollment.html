@@ -3,9 +3,18 @@
   <td><%= enrollment.email %></td>
   <!--td><%= enrollment.author.loginname %></td-->
   <td><%= enrollment.contact %></td>
-  <td><%= enrollment.option %></td>
-  <td><%= enrollment.create_at %></td>
+
+  <%
+  if (enrollment.options.hasOwnProperty('public_fields')) {
+    enrollment.options['public_fields'].forEach(function(field) { %>
+      <td><%= enrollment.options[field] %></td>
+  <%
+    });
+  }
+  %>
+
   <td><%= enrollment.balance %></td>
+  <td><%= enrollment.create_at %></td>
   <td>
     <% if (current_user && current_user.is_admin ||
     (current_user && current_user._id.toString() == enrollment.author._id.toString())

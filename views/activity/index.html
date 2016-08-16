@@ -162,39 +162,14 @@
       </div>
     </div>
   </div>
-  <!--########## enrollment list ###########-->
-  <!--TODO: 本人报名人员：10，其中正在排队人员：10 (红色区域为排队人员): tr class="error"-->
-  <% if (topic.enrollments && topic.enrollments.length > 0) { %>
-  <div class='panel'>
-    <div class='header'>
-      <span class='col_fade'><%= topic.enrollments.length %> enrolled, x on standby</span>
-    </div>
-    <div class='inner reply'>
-      <table class="table table-striped table-condensed">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Email</th>
-            <th>Contact</th>
-            <th>Option</th>
-            <th>Time</th>
-            <th>Balance</th>
-            <% if (topic.options !== "" && ) {
-            }
-            %>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <%- partial('../enrollment/enrollment', topic.enrollments) %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <% } %>
 
   <!--TODO: use ajax for 报名-->
-  <% if (current_user && typeof(topic) !== 'undefined') { %>
+  <%
+  // store fields visible to public, since some only visible to admin for privacy reason
+  // key: field.id, value: field.label for display
+  var public_fields = {};
+
+  if (current_user && typeof(topic) !== 'undefined') { %>
   <div class='panel'>
     <div class='header'>
       <span class='col_fade'>添加enrollment</span>
@@ -219,47 +194,45 @@
 
         <!--handle custom options-->
         <%var hasPrice = false, hasAttendance = false;
-          var public_fields = [];  // fields visible to public, some only visible to admin for privacy reason
 
-          if (topic.options !== "") {
+          if (topic.enroll_options !== "") {
           try {
-            var obj = JSON.parse(topic.options);
-            obj.forEach( function(option) {
-              //console.log(JSON.stringify(option));
-              if (!option.hasOwnProperty('type')) {
+            var more_fields = JSON.parse(topic.enroll_options);
+            more_fields.forEach( function(field) {
+              //console.log(JSON.stringify(field));
+              if (!field.hasOwnProperty('type')) {
                 throw new Error("Each option must have a type attribue (text, number or select).");
               }
-              if (!option.hasOwnProperty('id')) {
+              if (!field.hasOwnProperty('id')) {
                 throw new Error("Each option must have a unique id attribue.");
               } else {
-                //option.id = "id_" + option.id;
+                //field.id = "id_" + field.id;
               }
-              if (!option.hasOwnProperty('name')) {
+              if (!field.hasOwnProperty('name')) {
                 // for both form and storage in db
                 // Add a suffix to avoid duplication with existent field id
                 // Note: this suffix must be consistent with that in add() method of enrollment controller
-                option.name = "option_" + option.id;
+                field.name = "option_" + field.id;
               }
-              if (!option.hasOwnProperty('label')) {
-                option.label = _.capitalize(option.id.replace(/[-_\s]+/g, ' ')); // TODO: capitalize each word
-              }
-              if (!option.hasOwnProperty('desc')) {
-                option.desc = "";
+              if (!field.hasOwnProperty('label')) {
+                field.label = _.capitalize(field.id.replace(/[-_\s]+/g, ' ')); // TODO: capitalize each word
               }
 
-              if (option.hasOwnProperty('public')) {
-                public_fields.push(option.id);
+              if (field.hasOwnProperty('public') && field.public === true) {
+                public_fields[field.name] = field.label;
               }
 
-              switch (option.type) {
+              switch (field.type) {
                 case "text":
                 case "number":
               %>
                   <div class="control-group">
-                    <label for="<%= option.id %>" class="control-label col-sm-2"><%= option.label %></label>
+                    <label for="<%= field.id %>" class="control-label col-sm-2"><%= field.label %></label>
                     <div class="col-sm-5">
-                      <input type="<%= option.type %>" id="<%= option.id %>" name="<%= option.name %>" />
-                      <span>("<%= option.desc %>")</span>
+                      <input type="<%= field.type %>" id="<%= field.id %>" name="<%= field.name %>" />
+                      <% if (field.hasOwnProperty('desc')) { %>
+                        <span>(<%= field.desc %>)</span>
+                      <% } %>
                     </div>
                   </div>
               <%
@@ -267,17 +240,14 @@
 
                 case "select":
                   // TODO: validate options
-                  // if (!option.hasOwnProperty('value')) {
-                  //   throw new Error("Each option must have a value attribue.");
-                  // }
               %>
                   <div class="control-group">
-                    <label for="<%= option.id %>" class="control-label col-sm-2"><%= option.label %></label>
+                    <label for="<%= field.id %>" class="control-label col-sm-2"><%= field.label %></label>
                     <div class="col-sm-5">
-                      <select id="<%= option.id %>" name="<%= option.name %>">
+                      <select id="<%= field.id %>" name="<%= field.name %>">
                         <option value="">请选择</option>
                         <% var option_attrs = "";
-                          option.options.forEach( function(opt) {
+                          field.options.forEach( function(opt) {
                             for (var prop in opt) {
                               if (prop  !== 'value') {
                                 if (prop  === 'price') hasPrice = true;
@@ -309,29 +279,34 @@
         <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
         <!--optional fields, only display when mentioned in custom fields</label-->
-        <% if (hasAttendance) { %>
+        <% if (hasAttendance) {
+          public_fields['option_attendance'] = 'Head Count';
+        %>
         <div class="control-group">
-          <label for="attendance" class="control-label col-sm-2">Attendance</label>
+          <label for="option_attendance" class="control-label col-sm-2">Attendance</label>
           <div class="col-sm-5">
-            <input type="number" id="attendance" name="attendance" value="<%= typeof(attendance) !== 'undefined' && attendance || 1 %>" readonly/>
+            <input type="number" id="option_attendance" name="option_attendance" value="<%= typeof(option_attendance) !== 'undefined' && option_attendance || 1 %>" readonly/>
           </div>
         </div>
         <%
         }
 
-        if (hasPrice) { 
+        if (hasPrice) {
+          public_fields['option_price'] = 'Price';
         %>
         <div class="control-group">
-          <label for="price" class="control-label col-sm-2">Price</label>
+          <label for="option_price" class="control-label col-sm-2">Price</label>
           <div class="col-sm-5">
-            <input type="number" id="price" name="price" value="<%= typeof(price) !== 'undefined' && price || '99' %>" readonly/>
+            <input type="number" id="option_price" name="option_price" value="<%= typeof(option_price) !== 'undefined' && option_price || '99' %>" readonly/>
           </div>
         </div>
         <%
         } 
 
-        if (public_fields.length > 0) { // add a hidden field 
-          <input type="hidden" name="public_fields" value="<%= public_fields.join('|') %>" />
+        if (Object.keys(public_fields).length > 0) { // add a hidden field for public_fields
+        %>
+          <input type="hidden" name="public_fields" value="<%= Object.keys(public_fields).join('|') %>" />
+        <%
         }
         %>
 
@@ -352,6 +327,45 @@
         </div>
 
       </form>
+    </div>
+  </div>
+  <% } %>
+
+
+  <!--########## enrollment list ###########-->
+  <!--TODO: 本人报名人员：10，其中正在排队人员：10 (红色区域为排队人员): tr class="error"-->
+  <% if (topic.enrollments && topic.enrollments.length > 0) { %>
+  <div class='panel'>
+    <div class='header'>
+      <span class='col_fade'><%= topic.enrollments.length %> enrolled, x on standby</span>
+    </div>
+    <div class='inner reply'>
+      <table class="table table-striped table-condensed">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Contact</th>
+
+            <% var options = topic.enrollments[0].options;
+            console.log('Fields: ' + JSON.stringify(options));
+            if (options.hasOwnProperty('public_fields')) {
+              options['public_fields'].forEach(function(field) { %>
+                <th><%= public_fields[field] %></th>
+            <%
+              });
+            }
+            %>
+
+            <th>Balance</th>
+            <th>Time</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%- partial('../enrollment/enrollment', topic.enrollments) %>
+        </tbody>
+      </table>
     </div>
   </div>
   <% } %>
@@ -763,11 +777,11 @@ loading-text="回复中.." value="回复" >
     $('select').on('change', function () {
       var option = $('option:selected', this);
 
-      $('#attendance').val((typeof(option.attr('attendance')) !== 'undefined') ? option.attr('attendance') : 1);
+      $('#option_attendance').val((typeof(option.attr('attendance')) !== 'undefined') ? option.attr('attendance') : 1);
 
       if (typeof(option.attr('price')) !== 'undefined') {
         var attr = option.attr('price');
-        $('#price').val(attr);
+        $('#option_price').val(attr);
 
         var price = parseFloat(attr);
         var money = parseFloat($('#balance').val());
@@ -780,7 +794,7 @@ loading-text="回复中.." value="回复" >
           $('#enroll-btn').prop("disabled", false);
         }
       } else {
-        $('#price').val(0);
+        $('#option_price').val(0);
       }
     });
 

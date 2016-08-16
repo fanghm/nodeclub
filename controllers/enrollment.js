@@ -62,7 +62,7 @@ exports.add = function (req, res, next) {
     console.log("req.body: " + JSON.stringify(req.body) );
 
     for(var prop in req.body) {
-      if (enrollment.hasOwnProperty(prop)) {
+      if (Object.getPrototypeOf(enrollment).hasOwnProperty(prop)) {
         enrollment[prop] = req.body[prop];
       } else if (prop.substr(0, 7) === "option_" && req.body[prop].trim() !== "") {
         options[prop] = req.body[prop].trim();
@@ -70,7 +70,7 @@ exports.add = function (req, res, next) {
     }
 
     if (req.body.hasOwnProperty('public_fields')) {
-      options['public_fields'] = req.body[public_fields].trim();
+      options['public_fields'] = req.body.public_fields.trim().split('|');
     }
 
     console.log("Custom options: " + JSON.stringify(options));

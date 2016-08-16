@@ -33,7 +33,7 @@ var ActivitySchema = new Schema({
   regret_date: { type: Date}, // 活动退票截止时间
   deadline: { type: Date},    // 活动报名截止时间
   
-  options: { type: String },  // 其他注意事项
+  enroll_options: { type: String },  // 其他注意事项
   
   is_activity: { type: Boolean, default: true },  // 活动帖
   top: { type: Boolean, default: false },         // 置顶帖
