@@ -4,11 +4,14 @@
   <!--td><%= enrollment.author.loginname %></td-->
   <td><%= enrollment.contact %></td>
 
-  <%
+  <% //console.log(">>>enrollment:" + JSON.stringify(enrollment));
   if (enrollment.options.hasOwnProperty('public_fields')) {
-    enrollment.options['public_fields'].forEach(function(field) { %>
-      <td><%= enrollment.options[field] %></td>
-  <%
+    enrollment.options['public_fields'].forEach(function(field) {
+      if (enrollment.options.hasOwnProperty(field)) { %>
+        <td><%= enrollment.options[field] %></td>
+   <% } else { %>
+        <td><%= enrollment[field] %></td>
+   <% }
     });
   }
   %>

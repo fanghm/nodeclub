@@ -139,7 +139,7 @@
           </tr>
           <tr>
             <th>活动开始时间</th>
-            <td><%= topic.start_date %></td>
+            <td><%= topic.start_date %>(<%= topic.start_date_ago() %>)</td>
           </tr>
           <tr>
             <th>活动结束时间</th>
@@ -200,25 +200,37 @@
             var more_fields = JSON.parse(topic.enroll_options);
             more_fields.forEach( function(field) {
               //console.log(JSON.stringify(field));
-              if (!field.hasOwnProperty('type')) {
-                throw new Error("Each option must have a type attribue (text, number or select).");
-              }
-              if (!field.hasOwnProperty('id')) {
-                throw new Error("Each option must have a unique id attribue.");
-              } else {
-                //field.id = "id_" + field.id;
-              }
-              if (!field.hasOwnProperty('name')) {
-                // for both form and storage in db
-                // Add a suffix to avoid duplication with existent field id
-                // Note: this suffix must be consistent with that in add() method of enrollment controller
-                field.name = "option_" + field.id;
-              }
-              if (!field.hasOwnProperty('label')) {
-                field.label = _.capitalize(field.id.replace(/[-_\s]+/g, ' ')); // TODO: capitalize each word
+
+              if (!field.hasOwnProperty('type')
+                || -1 === ['text', 'number', 'select'].indexOf(field.type)) {
+                throw new Error("Each option must and can only have one of the type attribues [text, number or select].");
               }
 
-              if (field.hasOwnProperty('public') && field.public === true) {
+              if (!field.hasOwnProperty('id')) {
+                throw new Error("Each option must have a id attribue.");
+              } else {
+                if (!field.hasOwnProperty('name')) {
+                  // Add a suffix to avoid duplication with existent field id
+                  // Note: this suffix must be consistent with that in add() method of enrollment controller
+                  field.name = 'option_' + field.id;
+                }
+
+                if (!field.hasOwnProperty('label')) {
+                  field.label = _.capitalize(field.id.replace(/[-_\s]+/g, ' ')); // TODO: capitalize each word
+                }
+
+                field.id = "_id_" + field.id; // to avoid possible id conflict
+              }
+
+              if (!field.hasOwnProperty('placeholder')) {
+                field.placeholder = '';
+              }
+
+              if (!field.hasOwnProperty('value')) {
+                field.value = '';
+              }
+
+              if (field.hasOwnProperty('public') && field.public) {
                 public_fields[field.name] = field.label;
               }
 
@@ -229,7 +241,7 @@
                   <div class="control-group">
                     <label for="<%= field.id %>" class="control-label col-sm-2"><%= field.label %></label>
                     <div class="col-sm-5">
-                      <input type="<%= field.type %>" id="<%= field.id %>" name="<%= field.name %>" />
+                      <input type="<%= field.type %>" id="<%= field.id %>" name="<%= field.name %>" placeholder="<%= field.placeholder %>" value="<%= field.value %>" />
                       <% if (field.hasOwnProperty('desc')) { %>
                         <span>(<%= field.desc %>)</span>
                       <% } %>
@@ -250,8 +262,12 @@
                           field.options.forEach( function(opt) {
                             for (var prop in opt) {
                               if (prop  !== 'value') {
-                                if (prop  === 'price') hasPrice = true;
-                                if (prop  === 'attendance') hasAttendance = true;
+                                if (prop  === 'price') {
+                                  hasPrice = true;
+                                } else if (prop  === 'attendance') {
+                                  hasAttendance = true;
+                                }
+
                                 option_attrs += " " + prop + "=" + opt[prop];
                               }
                             };
@@ -278,26 +294,27 @@
         } %>
         <!--label for="enroll_info" class="control-label">已报名名单</label-->
 
-        <!--optional fields, only display when mentioned in custom fields</label-->
         <% if (hasAttendance) {
-          public_fields['option_attendance'] = 'Head Count';
+          public_fields['attendance'] = 'Attendance';
+        }
         %>
+
         <div class="control-group">
-          <label for="option_attendance" class="control-label col-sm-2">Attendance</label>
+          <label for="attendance" class="control-label col-sm-2">Attendance</label>
           <div class="col-sm-5">
-            <input type="number" id="option_attendance" name="option_attendance" value="<%= typeof(option_attendance) !== 'undefined' && option_attendance || 1 %>" readonly/>
+            <input type="number" id="attendance" name="attendance" value="<%= typeof(attendance) !== 'undefined' && attendance || 1 %>" <%= hasAttendance ? 'readonly' : ''%> />
           </div>
         </div>
-        <%
-        }
 
-        if (hasPrice) {
-          public_fields['option_price'] = 'Price';
+        <%
+        //optional fields, only display when mentioned in custom fields, or this is a paid activity        
+        if (hasPrice || topic.need_pay) {
+          public_fields['price'] = 'Price';
         %>
         <div class="control-group">
-          <label for="option_price" class="control-label col-sm-2">Price</label>
+          <label for="price" class="control-label col-sm-2">Price</label>
           <div class="col-sm-5">
-            <input type="number" id="option_price" name="option_price" value="<%= typeof(option_price) !== 'undefined' && option_price || '99' %>" readonly/>
+            <input type="number" id="price" name="price" value="<%= typeof(price) !== 'undefined' && price %>" <%= hasPrice ? 'readonly' : 'required'%> />
           </div>
         </div>
         <%
@@ -347,8 +364,10 @@
             <th>Email</th>
             <th>Contact</th>
 
-            <% var options = topic.enrollments[0].options;
-            console.log('Fields: ' + JSON.stringify(options));
+            <%
+            // based on latest enrollment record as public attribute may be changed later from activity
+            var options = topic.enrollments[topic.enrollments.length-1].options;
+            //console.log('Fields: ' + JSON.stringify(options));
             if (options.hasOwnProperty('public_fields')) {
               options['public_fields'].forEach(function(field) { %>
                 <th><%= public_fields[field] %></th>
@@ -379,6 +398,7 @@
     <%- partial('../reply/reply', topic.replies) %>
   </div>
   <% } %>
+
   <% if (current_user && typeof(topic) !== 'undefined') { %>
   <div class='panel'>
     <div class='header'>
@@ -777,11 +797,11 @@ loading-text="回复中.." value="回复" >
     $('select').on('change', function () {
       var option = $('option:selected', this);
 
-      $('#option_attendance').val((typeof(option.attr('attendance')) !== 'undefined') ? option.attr('attendance') : 1);
+      $('#attendance').val((typeof(option.attr('attendance')) !== 'undefined') ? option.attr('attendance') : 1);
 
       if (typeof(option.attr('price')) !== 'undefined') {
         var attr = option.attr('price');
-        $('#option_price').val(attr);
+        $('#price').val(attr);
 
         var price = parseFloat(attr);
         var money = parseFloat($('#balance').val());
@@ -794,7 +814,7 @@ loading-text="回复中.." value="回复" >
           $('#enroll-btn').prop("disabled", false);
         }
       } else {
-        $('#option_price').val(0);
+        $('#price').val(0);
       }
     });
 

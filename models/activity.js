@@ -4,6 +4,7 @@ var Schema    = mongoose.Schema;
 var ObjectId  = Schema.ObjectId;
 var config    = require('../config');
 var _         = require('lodash');
+var tools     = require('../common/tools');
 
 var ActivitySchema = new Schema({
   author_id: { type: ObjectId },
@@ -69,6 +70,22 @@ ActivitySchema.virtual('tabName').get(function () {
     return '';
   }
 });
+
+ActivitySchema.methods.start_date_ago = function() {
+  return tools.formatDate(this.start_date, true);
+}
+
+ActivitySchema.methods.end_date_ago = function() {
+  return tools.formatDate(this.end_date, true);
+}
+
+ActivitySchema.methods.regret_date_ago = function() {
+  return tools.formatDate(this.regret_date, true);
+}
+
+ActivitySchema.methods.deadline_ago = function() {
+  return tools.formatDate(this.deadline, true);
+}
 
 // Save events to 'topics' collection as well 
 // so that they can be displayed easily together with common posts

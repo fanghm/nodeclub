@@ -6,7 +6,7 @@ var User       = require('./user');
 var at         = require('../common/at');
 
 /**
- * 根据主题ID，获取回复列表
+ * 根据主题ID，获取Enrollment列表(including author whose mobile/email will be used as default contact method in enrolling)
  * Callback:
  * - err, 数据库异常
  * - enrollments, 回复列表
