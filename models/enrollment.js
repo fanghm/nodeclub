@@ -1,6 +1,5 @@
 var mongoose  = require('mongoose');
 var BaseModel = require("./base_model");
-var tools     = require('../common/tools');
 
 var Schema    = mongoose.Schema;
 var ObjectId  = Schema.ObjectId;
@@ -28,15 +27,5 @@ var EnrollmentSchema = new Schema({
 EnrollmentSchema.plugin(BaseModel);
 EnrollmentSchema.index({activity_id: 1});
 EnrollmentSchema.index({author_id: 1, create_at: -1});
-
-EnrollmentSchema.methods.format = function(date_field, friendly) {
-  if (Object.getPrototypeOf(this).hasOwnProperty(date_field)) {
-    return tools.formatDate(this[date_field], friendly);
-  } else if (this.hasOwnProperty(date_field)) {
-    return tools.formatDate(this[date_field], friendly);
-  } else {
-    return 'Long long ago...'; // :)
-  }
-}
 
 mongoose.model('Enrollment', EnrollmentSchema);

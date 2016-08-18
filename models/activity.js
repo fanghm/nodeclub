@@ -72,16 +72,6 @@ ActivitySchema.virtual('tabName').get(function () {
   }
 });
 
-ActivitySchema.methods.format = function(date_field, friendly) {
-  if (Object.getPrototypeOf(this).hasOwnProperty(date_field)) {
-    return tools.formatDate(this[date_field], friendly);
-  } else if (this.hasOwnProperty(date_field)) {
-    return tools.formatDate(this[date_field], friendly);
-  } else {
-    return 'Long long ago...'; // :)
-  }
-}
-
 // Save events to 'topics' collection as well 
 // so that they can be displayed easily together with common posts
 mongoose.model('Activity', ActivitySchema, 'topics');
