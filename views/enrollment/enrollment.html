@@ -17,7 +17,7 @@
   %>
 
   <td><%= enrollment.balance %></td>
-  <td><%= enrollment.create_at %></td>
+  <td><%= enrollment.format('create_at', false) %></td>
   <td>
     <% if (current_user && current_user.is_admin ||
     (current_user && current_user._id.toString() == enrollment.author._id.toString())

@@ -1,0 +1,13 @@
+TODO list
+- Search BBS with mutliple keywords via MongoDB text index:
+http://stackoverflow.com/questions/16902674/mongodb-text-search-and-multiple-search-words
+
+- Sanitize user input for activity's option field, or use forms for adding customized fields
+
+
+
+
+
+
+
+

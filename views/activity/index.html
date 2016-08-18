@@ -139,19 +139,19 @@
           </tr>
           <tr>
             <th>活动开始时间</th>
-            <td><%= topic.start_date %>(<%= topic.start_date_ago() %>)</td>
+            <td><%= topic.format('start_date', false) %> (<%= topic.format('start_date', true) %>)</td>
           </tr>
           <tr>
             <th>活动结束时间</th>
-            <td><%= topic.end_date %></td>
+            <td><%= topic.format('end_date', false) %> (<%= topic.format('end_date', true) %>)</td>
           </tr>
           <tr>
             <th>活动退票截止时间</th>
-            <td><%= topic.regret_date %></td>
+            <td><%= topic.format('regret_date', false) %> (<%= topic.format('regret_date', true) %>)</td>
           </tr>
           <tr>
             <th>活动报名截止时间</th>
-            <td><%= topic.deadline %></td>
+            <td><%= topic.format('deadline', false) %> (<%= topic.format('deadline', true) %>)</td>
           </tr>
           <tr>
             <th>活动details</th>
@@ -241,7 +241,7 @@
                   <div class="control-group">
                     <label for="<%= field.id %>" class="control-label col-sm-2"><%= field.label %></label>
                     <div class="col-sm-5">
-                      <input type="<%= field.type %>" id="<%= field.id %>" name="<%= field.name %>" placeholder="<%= field.placeholder %>" value="<%= field.value %>" />
+                      <input type="<%= field.type %>" id="<%= field.id %>" name="<%= field.name %>" placeholder="<%= field.placeholder %>" value="<%= field.value %>" required/>
                       <% if (field.hasOwnProperty('desc')) { %>
                         <span>(<%= field.desc %>)</span>
                       <% } %>
@@ -256,7 +256,7 @@
                   <div class="control-group">
                     <label for="<%= field.id %>" class="control-label col-sm-2"><%= field.label %></label>
                     <div class="col-sm-5">
-                      <select id="<%= field.id %>" name="<%= field.name %>">
+                      <select id="<%= field.id %>" name="<%= field.name %>" required>
                         <option value="">请选择</option>
                         <% var option_attrs = "";
                           field.options.forEach( function(opt) {
@@ -377,7 +377,7 @@
             %>
 
             <th>Balance</th>
-            <th>Time</th>
+            <th>Enroll Time</th>
             <th></th>
           </tr>
         </thead>
